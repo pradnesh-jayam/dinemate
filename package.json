@@ -1,0 +1,18 @@
+{
+  "name": "dinemate",
+  "version": "1.0.0",
+  "description": "A web app for discovering nearby restaurants and matching with people available to dine at the same place and time.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [
+    "restaurants",
+    "dining",
+    "matching",
+    "supabase",
+    "javascript"
+  ],
+  "author": "",
+  "license": "MIT"
+}

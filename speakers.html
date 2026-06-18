@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="DineMate possible dining matches." />
+    <title>DineMate | Matches</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body data-page="matches">
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand" aria-label="DineMate">
+          <div class="brand-mark">D</div>
+          <div>
+            <strong>DineMate</strong>
+            <span>Meet someone over a meal</span>
+          </div>
+        </div>
+        <nav class="nav" aria-label="Main navigation">
+          <a class="nav-item" href="dashboard.html">Dashboard</a>
+          <a class="nav-item" href="programs.html">Restaurants</a>
+          <a class="nav-item" href="meetings.html">Availability</a>
+          <a class="nav-item active" href="speakers.html">Matches</a>
+        </nav>
+        <section class="sync-panel">
+          <span class="status-dot" id="syncDot"></span>
+          <div>
+            <strong id="syncMode">Demo sync</strong>
+            <span id="syncText">Supabase connects when keys are added.</span>
+          </div>
+        </section>
+        <button class="sign-out-button" id="signOutBtn" type="button">Sign out</button>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Possible matches</p>
+            <h1>People available around your selected restaurants and times.</h1>
+          </div>
+          <a class="primary-button link-button" href="create-meeting.html">Add my time</a>
+        </header>
+        <section class="workspace-grid">
+          <section class="panel">
+            <div class="speaker-list" id="matchList"></div>
+          </section>
+          <aside class="panel">
+            <div class="panel-heading compact-heading">
+              <div>
+                <p class="eyebrow">Activity</p>
+                <h2>Dining updates</h2>
+              </div>
+            </div>
+            <div class="update-list" id="updateList"></div>
+          </aside>
+        </section>
+      </main>
+    </div>
+
+    <div id="toast" class="toast" role="status"></div>
+    <script src="config.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

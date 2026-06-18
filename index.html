@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="DineMate restaurant matching sign in." />
+    <title>DineMate | Sign In</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body data-page="auth">
+    <section class="auth-screen">
+      <div class="auth-card">
+        <div class="brand auth-brand" aria-label="DineMate">
+          <div class="brand-mark">D</div>
+          <div>
+            <strong>DineMate</strong>
+            <span>Meet someone over a meal</span>
+          </div>
+        </div>
+        <div>
+          <p class="eyebrow">Nearby dining</p>
+          <h1>Find restaurants and match with people who are free to eat.</h1>
+        </div>
+        <form class="stack-form" id="authForm" method="dialog">
+          <label>
+            <span>Full name</span>
+            <input id="authName" name="name" type="text" placeholder="Aisha Raman" />
+          </label>
+          <label>
+            <span>Email</span>
+            <input id="authEmail" name="email" type="email" placeholder="you@example.com" required />
+          </label>
+          <label>
+            <span>Password</span>
+            <input id="authPassword" name="password" type="password" placeholder="Minimum 6 characters" required />
+          </label>
+          <div class="auth-actions">
+            <button class="primary-button full-width" type="submit">Create account</button>
+            <button class="secondary-button full-width" type="button" id="signInBtn">Sign in</button>
+          </div>
+          <button class="demo-button" type="button" id="demoLoginBtn">Continue in demo mode</button>
+        </form>
+        <p class="small-text">Supabase Auth is used when keys are configured. Demo mode saves locally.</p>
+      </div>
+    </section>
+
+    <div id="toast" class="toast" role="status"></div>
+    <script src="config.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Choose a DineMate action." />
+    <title>DineMate | Choose Action</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body data-page="choice">
+    <section class="choice-screen">
+      <div class="choice-card">
+        <div class="brand auth-brand" aria-label="DineMate">
+          <div class="brand-mark">D</div>
+          <div>
+            <strong>DineMate</strong>
+            <span>Meet someone over a meal</span>
+          </div>
+        </div>
+        <p class="eyebrow">Welcome to DineMate</p>
+        <h2 id="choiceTitle">What would you like to do?</h2>
+        <div class="choice-grid">
+          <a class="choice-button" href="programs.html">
+            <strong>Explore restaurants</strong>
+            <span>See nearby places and who is available there.</span>
+          </a>
+          <a class="choice-button" href="create-meeting.html">
+            <strong>Add my time</strong>
+            <span>Pick a restaurant and share when you are free to dine.</span>
+          </a>
+          <a class="choice-button" href="speakers.html">
+            <strong>Find matches</strong>
+            <span>Review people who may be available for a random meal.</span>
+          </a>
+          <a class="choice-button" href="dashboard.html">
+            <strong>Open dashboard</strong>
+            <span>Review restaurants, dining times, matches, and updates.</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <div id="toast" class="toast" role="status"></div>
+    <script src="config.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
