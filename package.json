@@ -4,7 +4,8 @@
   "description": "A web app for discovering nearby restaurants and matching with people available to dine at the same place and time.",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "build": "node build-config.js"
   },
   "keywords": [
     "restaurants",

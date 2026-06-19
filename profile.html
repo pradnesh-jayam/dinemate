@@ -329,9 +329,35 @@
     </div>
   </div>
 
+  <!-- Theme Toggle -->
+  <div style="position: fixed; top: 20px; right: 20px; z-index: 1000;">
+    <button id="themeToggle" style="padding: 12px; border-radius: 50%; border: none; background: var(--bg-primary); color: var(--text-primary); box-shadow: var(--shadow-md); cursor: pointer; font-size: 20px; transition: var(--transition);">
+      🌙
+    </button>
+  </div>
+
   <div id="toast" class="toast"></div>
 
   <script src="config.js"></script>
+  <script>
+    // Theme Toggle Logic
+    const themeToggle = document.getElementById('themeToggle');
+    
+    // Check saved theme
+    const savedTheme = localStorage.getItem('dinemate-theme');
+    if (savedTheme) {
+      document.documentElement.setAttribute('data-theme', savedTheme);
+      themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+    }
+    
+    themeToggle.addEventListener('click', () => {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', newTheme);
+      localStorage.setItem('dinemate-theme', newTheme);
+      themeToggle.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+    });
+  </script>
   <script>
     // ========================================
     // Profile Page Logic

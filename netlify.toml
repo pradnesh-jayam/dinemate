@@ -1,9 +1,9 @@
 # netlify.toml - Netlify deployment configuration for DineMate
 
 [build]
-  # No build step needed - we serve files as-is
+  # Generate config.js from environment variables
   publish = "."
-  command = "echo 'DineMate ready for deployment'"
+  command = "node build-config.js"
 
 # Redirect to choice.html for non-existent routes (SPA behavior)
 [[redirects]]
