@@ -537,25 +537,30 @@ async function authenticate(mode) {
   goTo("choice.html");
 }
 
-function bindAuthPage() {
-  const authForm = $("#authForm");
-  if (!authForm) return;
+async function signInWithGoogle() {
+  if (!supabaseClient) {
+    showToast("Supabase not configured. Please set up your environment variables.");
+    return;
+  }
 
-  authForm.addEventListener("submit", (event) => {
-    event.preventDefault();
-    authenticate("signup");
-  });
-
-  $("#signInBtn")?.addEventListener("click", () => authenticate("signin"));
-
-  $("#demoLoginBtn")?.addEventListener("click", () => {
-    saveLocalUser({
-      id: crypto.randomUUID(),
-      name: "Demo Diner",
-      email: "demo@dinemate.local"
+  try {
+    const { data, error } = await supabaseClient.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: window.location.origin + "/choice.html"
+      }
     });
-    goTo("choice.html");
-  });
+
+    if (error) {
+      showToast(`Login error: ${error.message}`);
+    }
+  } catch (error) {
+    showToast(`Login failed: ${error.message}`);
+  }
+}
+
+function bindAuthPage() {
+  $("#googleLoginBtn")?.addEventListener("click", signInWithGoogle);
 }
 
 function bindSharedAppActions() {
