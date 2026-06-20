@@ -1,86 +1,47 @@
-const http = require("http");
-const https = require("https");
-const fs = require("fs");
-const path = require("path");
-const url = require("url");
+const http = require('http');
+const fs = require('fs');
+const path = require('path');
 
-const root = __dirname;
-const port = Number(process.env.PORT || 5173);
-const MAPPLS_API_KEY = "apbjiwyfjavgdpjfgkhtwfkwjtuaigtscyvu";
+const PORT = 3000;
 
 const mimeTypes = {
-  ".html": "text/html; charset=utf-8",
-  ".css": "text/css; charset=utf-8",
-  ".js": "text/javascript; charset=utf-8",
-  ".json": "application/json; charset=utf-8",
-  ".md": "text/markdown; charset=utf-8",
-  ".sql": "text/plain; charset=utf-8"
+  '.html': 'text/html',
+  '.js': 'text/javascript',
+  '.css': 'text/css',
+  '.json': 'application/json',
+  '.png': 'image/png',
+  '.jpg': 'image/jpg',
+  '.gif': 'image/gif',
+  '.svg': 'image/svg+xml',
+  '.ico': 'image/x-icon'
 };
 
-// Handle Mappls API requests via backend proxy
-function handleMapplsProxy(res, query) {
-  const location = query.location || "28.6139,77.2090"; // Default to Delhi
-  const keyword = query.keyword || "restaurant";
-  
-  const mapplsUrl = `https://apis.mappls.com/advancedmaps/v1/place_search/nearby?location=${location}&keyword=${keyword}&radius=5000&limit=12&key=${MAPPLS_API_KEY}`;
-  
-  https.get(mapplsUrl, (mapplsRes) => {
-    let data = "";
-    mapplsRes.on("data", chunk => data += chunk);
-    mapplsRes.on("end", () => {
-      res.writeHead(200, { "Content-Type": "application/json" });
-      res.end(data);
-    });
-  }).on("error", (err) => {
-    res.writeHead(500, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({ error: "Mappls API error", details: err.message }));
-  });
-}
+const server = http.createServer((req, res) => {
+  let filePath = '.' + req.url;
+  if (filePath === './') {
+    filePath = './dashboard-final.html';
+  }
 
-http
-  .createServer((req, res) => {
-    // Enable CORS
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-    
-    if (req.method === "OPTIONS") {
-      res.writeHead(200);
-      res.end();
-      return;
-    }
+  const extname = String(path.extname(filePath)).toLowerCase();
+  const contentType = mimeTypes[extname] || 'application/octet-stream';
 
-    // Handle API proxy
-    if (req.url.startsWith("/api/restaurants")) {
-      const query = url.parse(req.url, true).query;
-      handleMapplsProxy(res, query);
-      return;
-    }
-
-    let requestPath = decodeURIComponent(req.url.split("?")[0]);
-    if (requestPath === "/") requestPath = "/index.html";
-
-    const filePath = path.normalize(path.join(root, requestPath));
-    if (!filePath.startsWith(root)) {
-      res.writeHead(403);
-      res.end("Forbidden");
-      return;
-    }
-
-    fs.readFile(filePath, (error, data) => {
-      if (error) {
-        res.writeHead(404);
-        res.end("Not found");
-        return;
+  fs.readFile(filePath, (error, content) => {
+    if (error) {
+      if (error.code === 'ENOENT') {
+        res.writeHead(404, { 'Content-Type': 'text/html' });
+        res.end('<h1>404 Not Found</h1>', 'utf-8');
+      } else {
+        res.writeHead(500);
+        res.end('Server Error: ' + error.code, 'utf-8');
       }
-
-      res.writeHead(200, {
-        "Content-Type": mimeTypes[path.extname(filePath)] || "application/octet-stream"
-      });
-      res.end(data);
-    });
-  })
-  .listen(port, "127.0.0.1", () => {
-    console.log(`🚀 DineMate running on http://127.0.0.1:${port}`);
-    console.log(`📍 Mappls API proxy enabled`);
+    } else {
+      res.writeHead(200, { 'Content-Type': contentType });
+      res.end(content, 'utf-8');
+    }
   });
+});
+
+server.listen(PORT, () => {
+  console.log(`Server running at http://localhost:${PORT}/`);
+  console.log('Open http://localhost:3000 in your browser');
+});

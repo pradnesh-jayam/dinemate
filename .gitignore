@@ -23,7 +23,6 @@ server.out.log
 *.swp
 *.swo
 *~
-dinemate.code-workspace
 
 # OS
 .DS_Store

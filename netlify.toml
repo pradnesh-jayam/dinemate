@@ -1,14 +1,14 @@
 # netlify.toml - Netlify deployment configuration for DineMate
 
 [build]
-  # Generate config.js from environment variables
+  # No build step needed - we serve files as-is
   publish = "."
-  command = "node build-config.js"
+  command = "echo 'DineMate ready for deployment'"
 
-# Redirect to choice.html for non-existent routes (SPA behavior)
+# Redirect to dashboard-final.html for non-existent routes
 [[redirects]]
   from = "/*"
-  to = "/"
+  to = "/dashboard-final.html"
   status = 200
 
 # Security headers
@@ -20,17 +20,6 @@
     X-XSS-Protection = "1; mode=block"
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "geolocation=(), microphone=(), camera=()"
-
-# Cache static assets
-[[headers]]
-  for = "/styles.css"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-
-[[headers]]
-  for = "/app.js"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
 
 [[headers]]
   for = "/*.html"
