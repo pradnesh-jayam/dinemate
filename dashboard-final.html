@@ -1686,7 +1686,7 @@
     // State
     let currentUser = null;
     let currentLocation = 'New Delhi';
-    let locations = JSON.parse(localStorage.getItem('dinemate-locations')) || ['New Delhi', 'Mumbai', 'Bangalore', 'Hyderabad', 'Chennai'];
+    let locations = ['New Delhi']; // placeholder until loadLocations() fetches the real shared list from Firestore
     let currentSlotId = null;
     let chatListener = null;
     let notificationsListener = null;
@@ -1720,6 +1720,7 @@
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         currentUser = user;
+        await loadLocations();
         await checkOnboarding();
         showApp();
       } else {
@@ -1727,6 +1728,33 @@
         showLogin();
       }
     });
+
+    // Locations now live in a single shared Firestore doc: meta/locations -> { cities: [...] }
+    // This makes the city list global (same for every user/device) instead of per-browser localStorage.
+    async function loadLocations() {
+      const defaultCities = ['New Delhi', 'Mumbai', 'Bangalore', 'Hyderabad', 'Chennai', 'Trichy', 'Thanjavur'];
+      try {
+        const metaDoc = await getDoc(doc(db, 'meta', 'locations'));
+        if (metaDoc.exists() && Array.isArray(metaDoc.data().cities) && metaDoc.data().cities.length > 0) {
+          locations = metaDoc.data().cities;
+        } else {
+          // First time ever loading: seed the shared doc with sensible defaults
+          await setDoc(doc(db, 'meta', 'locations'), { cities: defaultCities }, { merge: true });
+          locations = defaultCities;
+        }
+      } catch (error) {
+        console.error('Failed to load locations from Firestore, using defaults:', error);
+        locations = defaultCities;
+      }
+    }
+
+    // Adds a new city to the SHARED Firestore list so every user/device sees it, not just this browser.
+    async function addLocationGlobal(name) {
+      if (!locations.includes(name)) {
+        locations.push(name);
+        await setDoc(doc(db, 'meta', 'locations'), { cities: locations }, { merge: true });
+      }
+    }
 
     googleSignInBtn.addEventListener('click', () => {
       signInWithPopup(auth, googleProvider).catch((error) => {
@@ -1909,15 +1937,18 @@
       document.getElementById('addLocationModal').classList.add('show');
     });
 
-    document.getElementById('addLocationForm').addEventListener('submit', (e) => {
+    document.getElementById('addLocationForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const name = document.getElementById('newLocationName').value.trim();
       if (name && !locations.includes(name)) {
-        locations.push(name);
-        localStorage.setItem('dinemate-locations', JSON.stringify(locations));
-        closeModal('addLocationModal');
-        showToast('Location added!', 'success');
-        renderLocationList();
+        try {
+          await addLocationGlobal(name);
+          closeModal('addLocationModal');
+          showToast('Location added for everyone!', 'success');
+          renderLocationList();
+        } catch (error) {
+          showToast(error.message, 'error');
+        }
       }
       e.target.reset();
     });
