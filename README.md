@@ -69,7 +69,7 @@ dinemate-vscode/
 
 ## Prerequisites
 
-- **Node.js 20+** (for local development)
+- **Node.js 14+** (for local development)
 - **Firebase Project** (create at [console.firebase.google.com](https://console.firebase.google.com))
 - **Google OAuth Credentials** (for sign-in)
 - **Netlify Account** (for deployment) - optional
