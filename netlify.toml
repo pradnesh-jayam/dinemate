@@ -5,10 +5,10 @@
   publish = "."
   command = "echo 'DineMate ready for deployment'"
 
-# Redirect to dashboard-final.html for non-existent routes
+# Redirect to choice.html for non-existent routes (SPA behavior)
 [[redirects]]
   from = "/*"
-  to = "/dashboard-final.html"
+  to = "/"
   status = 200
 
 # Security headers
@@ -19,7 +19,18 @@
     X-Content-Type-Options = "nosniff"
     X-XSS-Protection = "1; mode=block"
     Referrer-Policy = "strict-origin-when-cross-origin"
-    Permissions-Policy = "geolocation=(), microphone=(), camera=()"
+    Permissions-Policy = "geolocation=(self), microphone=(), camera=()"
+
+# Cache static assets
+[[headers]]
+  for = "/styles.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/app.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
 
 [[headers]]
   for = "/*.html"

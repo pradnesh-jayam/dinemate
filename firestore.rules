@@ -1,0 +1,99 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    function validRating() {
+      return request.resource.data.rating is number
+        && request.resource.data.rating >= 1
+        && request.resource.data.rating <= 5
+        && request.resource.data.uid == request.auth.uid;
+    }
+
+    match /users/{userId} {
+      allow read: if signedIn();
+      allow create, update: if isOwner(userId);
+      allow delete: if false;
+    }
+
+    match /restaurants/{restaurantId} {
+      allow read: if signedIn();
+      allow create: if signedIn() && request.resource.data.createdBy == request.auth.uid;
+      allow update: if signedIn();
+      allow delete: if signedIn() && resource.data.createdBy == request.auth.uid;
+
+      match /ratings/{userId} {
+        allow read: if signedIn();
+        allow create, update: if isOwner(userId) && validRating();
+        allow delete: if isOwner(userId);
+      }
+    }
+
+    match /slots/{slotId} {
+      allow read: if signedIn();
+      allow create: if signedIn()
+        && request.resource.data.hostId == request.auth.uid
+        && request.resource.data.maxCapacity is number
+        && request.resource.data.currentCapacity == 1
+        && request.resource.data.status in ['open', 'full', 'completed', 'cancelled'];
+      allow update: if signedIn();
+      allow delete: if signedIn()
+        && (resource.data.hostId == request.auth.uid || resource.data.createdBy == request.auth.uid);
+
+      match /messages/{messageId} {
+        allow read: if signedIn();
+        allow create: if signedIn()
+          && request.resource.data.uid == request.auth.uid
+          && request.resource.data.text is string
+          && request.resource.data.text.size() > 0
+          && request.resource.data.text.size() <= 1000;
+        allow update: if signedIn();
+        allow delete: if signedIn() && resource.data.uid == request.auth.uid;
+      }
+
+      match /typing/{userId} {
+        allow read: if signedIn();
+        allow create, update: if isOwner(userId);
+        allow delete: if isOwner(userId);
+      }
+    }
+
+    match /notifications/{notificationId} {
+      allow read: if signedIn() && resource.data.toUid == request.auth.uid;
+      allow create: if signedIn();
+      allow update: if signedIn() && resource.data.toUid == request.auth.uid;
+      allow delete: if signedIn() && resource.data.toUid == request.auth.uid;
+    }
+
+    match /friendRequests/{requestId} {
+      allow read: if signedIn()
+        && (resource.data.fromUid == request.auth.uid || resource.data.toUid == request.auth.uid);
+      allow create: if signedIn()
+        && request.resource.data.fromUid == request.auth.uid
+        && request.resource.data.status == 'pending';
+      allow update: if signedIn()
+        && resource.data.toUid == request.auth.uid
+        && request.resource.data.status in ['accepted', 'rejected'];
+      allow delete: if signedIn()
+        && (resource.data.fromUid == request.auth.uid || resource.data.toUid == request.auth.uid);
+    }
+
+    match /friends/{friendId} {
+      allow read: if signedIn() && request.auth.uid in resource.data.users;
+      allow create: if signedIn() && request.auth.uid in request.resource.data.users;
+      allow update, delete: if signedIn() && request.auth.uid in resource.data.users;
+    }
+
+    match /meta/{docId} {
+      allow read: if signedIn();
+      allow write: if signedIn();
+    }
+  }
+}

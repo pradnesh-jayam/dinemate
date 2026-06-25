@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="DineMate is a real-time dining companion platform for creating, joining, and chatting around restaurant meetups.">
+  <title>DineMate - Real-time dining companions</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="./src/styles.css">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
+</head>
+<body>
+  <section class="login-page" id="loginPage">
+    <div class="login-hero">
+      <a class="brand-mark" href="#" aria-label="DineMate home">
+        <i data-lucide="utensils"></i>
+        DineMate
+      </a>
+      <p class="eyebrow">Real-time social dining</p>
+      <h1>Find the right table before you commit to dinner.</h1>
+      <p class="hero-copy">Create restaurant slots, meet compatible diners nearby, chat before joining, and keep your dining circle warm with friends, notifications, and live updates.</p>
+      <div class="hero-actions">
+        <button class="btn btn-primary btn-lg" id="tryDemoBtn" type="button"><i data-lucide="play-circle"></i>Try Demo</button>
+        <button class="btn btn-secondary btn-lg" id="googleSignInBtn" type="button"><i data-lucide="log-in"></i>Sign in with Google</button>
+      </div>
+      <div class="feature-row">
+        <div class="feature-card">
+          <i data-lucide="calendar-plus"></i>
+          <strong>Create</strong>
+          <span>Pick a restaurant, time, capacity, and vibe for your table.</span>
+        </div>
+        <div class="feature-card">
+          <i data-lucide="messages-square"></i>
+          <strong>Connect</strong>
+          <span>Chat with hosts and diners before you join the slot.</span>
+        </div>
+        <div class="feature-card">
+          <i data-lucide="utensils-crossed"></i>
+          <strong>Dine</strong>
+          <span>Meet people, rate places, build friends, and track your stats.</span>
+        </div>
+      </div>
+    </div>
+    <aside class="login-panel">
+      <div class="live-preview-card">
+        <div class="preview-head">
+          <span class="status-pill"><i data-lucide="sparkles"></i>Top Pick</span>
+          <span class="time-pill"><i data-lucide="clock-3"></i>in 2h</span>
+        </div>
+        <h2>Yum Yum Cha</h2>
+        <p>Japanese dinner hosted by Maya Kapoor</p>
+        <div class="host-line">
+          <span class="avatar small-avatar">MK</span>
+          <span>2/4 seats taken</span>
+          <span class="cuisine-tag cuisine-japanese">Japanese</span>
+        </div>
+        <div class="preview-chat">
+          <span>Maya</span>
+          <p>Booked for 8 PM. Anyone vegetarian?</p>
+        </div>
+        <button class="btn btn-primary full" id="previewDemoBtn" type="button"><i data-lucide="arrow-right"></i>Open demo dashboard</button>
+      </div>
+    </aside>
+  </section>
+
+  <div class="demo-banner" id="demoBanner">
+    <i data-lucide="badge-alert"></i>
+    You're in Demo Mode — Sign in with Google for the full experience.
+  </div>
+
+  <div class="app-container" id="appContainer">
+    <nav class="navbar">
+      <div class="navbar-left">
+        <button class="navbar-logo" type="button" data-section="restaurants"><i data-lucide="utensils"></i>DineMate</button>
+        <div class="navbar-nav">
+          <button class="nav-link active" data-section="restaurants" type="button">Restaurants</button>
+          <button class="nav-link" data-section="create" type="button">Create</button>
+          <button class="nav-link" data-section="browse" type="button">Browse</button>
+          <button class="nav-link" data-section="map" type="button">Map</button>
+          <button class="nav-link" data-section="profile" type="button">Profile</button>
+          <button class="nav-link" data-section="analytics" type="button">Analytics</button>
+          <button class="nav-link" data-section="friends" type="button">Friends</button>
+        </div>
+      </div>
+      <div class="navbar-right">
+        <button class="icon-btn" id="locationBtn" type="button" title="Change location"><i data-lucide="map-pin"></i></button>
+        <button class="icon-btn" id="notificationsBtn" type="button" title="Notifications"><i data-lucide="bell"></i><span class="badge" id="notificationBadge">0</span></button>
+        <button class="icon-btn" id="messagesBtn" type="button" title="Messages"><i data-lucide="messages-square"></i></button>
+        <button class="icon-btn" id="themeBtn" type="button" title="Toggle theme"><i data-lucide="sun"></i></button>
+        <button class="user-pill" id="userMenuBtn" type="button">
+          <span class="avatar" id="userAvatar">DM</span>
+          <span id="userName">DineMate User</span>
+        </button>
+        <div class="user-menu" id="userMenu">
+          <button id="signOutBtn" type="button">Sign out</button>
+        </div>
+      </div>
+    </nav>
+
+    <main class="main-content">
+      <section class="section active" id="restaurantsSection">
+        <div class="section-header">
+          <div>
+            <p class="eyebrow">Discover</p>
+            <h1 class="section-title">Restaurants in <span id="currentLocationDisplay">New Delhi</span></h1>
+          </div>
+          <div class="header-actions">
+            <button class="btn btn-ghost" id="discoverNearbyBtn" type="button"><i data-lucide="radar"></i>Nearby</button>
+            <button class="btn btn-primary" id="addRestaurantBtn" type="button"><i data-lucide="plus"></i>Add Restaurant</button>
+          </div>
+        </div>
+        <div class="search-row">
+          <input class="form-input" id="globalSearchInput" type="search" placeholder="Search restaurants, cuisines, or areas">
+          <select class="form-select compact" id="placeCategoryFilter">
+            <option value="">All cuisines</option>
+            <option>Indian</option>
+            <option>South Indian</option>
+            <option>Cafe</option>
+            <option>Japanese</option>
+            <option>Italian</option>
+            <option>Thai</option>
+            <option>Mexican</option>
+            <option>Fast Food</option>
+          </select>
+        </div>
+        <div class="restaurant-grid" id="restaurantGrid"></div>
+      </section>
+
+      <section class="section" id="createSection">
+        <div class="section-header">
+          <div>
+            <p class="eyebrow">Host</p>
+            <h1 class="section-title">Create a dining slot</h1>
+          </div>
+        </div>
+        <div class="restaurant-grid" id="createRestaurantGrid"></div>
+      </section>
+
+      <section class="section" id="browseSection">
+        <div class="section-header">
+          <div>
+            <p class="eyebrow">Join</p>
+            <h1 class="section-title">Open slots in <span id="browseLocationDisplay">New Delhi</span></h1>
+          </div>
+          <div class="filter-toggle">
+            <button class="segmented active" id="upcomingToggle" type="button">Upcoming</button>
+            <button class="segmented" id="pastToggle" type="button">Past</button>
+          </div>
+        </div>
+        <div class="filters">
+          <select class="form-select compact" id="cuisineFilter"><option value="">All cuisines</option></select>
+          <input class="form-input compact" id="dateFilter" type="date">
+          <select class="form-select compact" id="partySizeFilter">
+            <option value="">Any party size</option>
+            <option value="2">2+ seats</option>
+            <option value="4">4+ seats</option>
+            <option value="6">6+ seats</option>
+          </select>
+          <button class="btn btn-ghost" id="clearFiltersBtn" type="button">Clear filters</button>
+        </div>
+        <div class="slot-list" id="slotList"></div>
+      </section>
+
+      <section class="section" id="mapSection">
+        <div class="section-header">
+          <div>
+            <p class="eyebrow">Explore</p>
+            <h1 class="section-title">Map discovery</h1>
+          </div>
+          <div class="header-actions">
+            <select class="form-select compact" id="mapRadius">
+              <option value="1500">1.5 km</option>
+              <option value="3000" selected>3 km</option>
+              <option value="5000">5 km</option>
+            </select>
+            <button class="btn btn-primary" id="mapRefreshBtn" type="button"><i data-lucide="refresh-cw"></i>Refresh</button>
+          </div>
+        </div>
+        <div class="map-layout">
+          <div id="map"></div>
+          <div class="map-results" id="mapResults">
+            <div class="empty-state"><div class="empty-illustration"><i data-lucide="map"></i></div><h2>Discover nearby places</h2><p>Search a city or use current location to find restaurants around you.</p></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="profileSection">
+        <div class="profile-shell">
+          <div class="profile-cover"></div>
+          <div class="profile-header">
+            <span class="profile-avatar" id="profileAvatar">DM</span>
+            <div>
+              <div class="profile-name-edit">
+                <h1 id="profileName">DineMate User</h1>
+                <button class="icon-btn small" id="editNameBtn" type="button"><i data-lucide="pencil"></i></button>
+              </div>
+              <p id="profileEmail">user@email.com</p>
+              <p id="profileBio">Looking for good food and better conversations.</p>
+            </div>
+          </div>
+          <div class="profile-stats">
+            <div><strong id="statHosted">0</strong><span>Hosted</span></div>
+            <div><strong id="statJoined">0</strong><span>Joined</span></div>
+            <div><strong id="statAdded">0</strong><span>Places</span></div>
+            <div><strong id="statFriends">0</strong><span>Friends</span></div>
+          </div>
+          <div class="profile-dashboard">
+            <div class="activity-card">
+              <div class="activity-ring" id="activityRing"><span id="activitySummary">0 hosted, 0 joined</span></div>
+              <div>
+                <p><strong>Dining streak</strong><span id="profileStreak">0 meals</span></p>
+                <p><strong>Member since</strong><span id="profileMemberSince">Today</span></p>
+              </div>
+            </div>
+            <div class="badge-row" id="badgesList"></div>
+          </div>
+          <div class="two-column profile-columns">
+            <div class="panel-card">
+              <h2>Upcoming slots</h2>
+              <div class="profile-slots" id="upcomingSlots"></div>
+            </div>
+            <div class="panel-card">
+              <h2>Past meals</h2>
+              <div class="profile-slots" id="pastSlots"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="analyticsSection">
+        <div class="section-header">
+          <div>
+            <p class="eyebrow">Stats</p>
+            <h1 class="section-title">Dining analytics</h1>
+          </div>
+        </div>
+        <div class="analytics-grid" id="analyticsGrid"></div>
+      </section>
+
+      <section class="section" id="friendsSection">
+        <div class="section-header">
+          <div>
+            <p class="eyebrow">Network</p>
+            <h1 class="section-title">Friends</h1>
+          </div>
+        </div>
+        <div class="two-column">
+          <div class="panel-card">
+            <h2>Find diners</h2>
+            <input class="form-input" id="userSearchInput" type="search" placeholder="Search demo users or signed-in diners">
+            <div class="stack" id="userSearchResults"></div>
+          </div>
+          <div class="panel-card">
+            <h2>Requests</h2>
+            <div class="stack" id="friendRequestsList"></div>
+            <h2>Your friends</h2>
+            <div class="stack" id="friendsList"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div class="tab-bar">
+      <button class="tab-bar-item active" data-section="restaurants" type="button"><i data-lucide="utensils"></i>Places</button>
+      <button class="tab-bar-item" data-section="create" type="button"><i data-lucide="calendar-plus"></i>Create</button>
+      <button class="tab-bar-item" data-section="browse" type="button"><i data-lucide="search"></i>Browse</button>
+      <button class="tab-bar-item" data-section="profile" type="button"><i data-lucide="user"></i>Profile</button>
+    </div>
+  </div>
+
+  <div class="modal" id="createSlotModal">
+    <div class="modal-content">
+      <div class="modal-header"><h2>Create dining slot</h2><button class="modal-close" data-close="createSlotModal" type="button"><i data-lucide="x"></i></button></div>
+      <form id="createSlotForm">
+        <label class="form-label" for="slotRestaurant">Restaurant</label>
+        <input class="form-input" id="slotRestaurant" readonly>
+        <label class="form-label" for="slotDate">Date</label>
+        <input class="form-input" id="slotDate" type="date" required>
+        <label class="form-label" for="slotTime">Time</label>
+        <input class="form-input" id="slotTime" type="time" required>
+        <label class="form-label" for="slotCapacity">Capacity</label>
+        <input class="form-input" id="slotCapacity" type="number" min="2" max="12" required>
+        <label class="form-label" for="slotNotes">Notes</label>
+        <textarea class="form-textarea" id="slotNotes" rows="3" placeholder="Vegetarian friendly, looking for two more people..."></textarea>
+        <div class="form-buttons">
+          <button class="btn btn-ghost" data-close="createSlotModal" type="button">Cancel</button>
+          <button class="btn btn-primary" type="submit"><i data-lucide="calendar-plus"></i>Create Slot</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="joinSlotModal">
+    <div class="modal-content">
+      <div class="modal-header"><h2>Join dining slot</h2><button class="modal-close" data-close="joinSlotModal" type="button"><i data-lucide="x"></i></button></div>
+      <form id="joinSlotForm">
+        <label class="form-label" for="joinRestaurant">Restaurant</label>
+        <input class="form-input" id="joinRestaurant" readonly>
+        <label class="form-label" for="joinDateTime">When</label>
+        <input class="form-input" id="joinDateTime" readonly>
+        <label class="form-label" for="joinHost">Host</label>
+        <input class="form-input" id="joinHost" readonly>
+        <label class="form-label" for="joinGroupSize">Seats</label>
+        <input class="form-input" id="joinGroupSize" readonly>
+        <label class="form-label" for="joinPartySize">Your party size</label>
+        <input class="form-input" id="joinPartySize" type="number" min="1" max="8" value="1">
+        <div class="form-buttons">
+          <button class="btn btn-ghost" id="joinChatFirstBtn" type="button"><i data-lucide="messages-square"></i>Chat First</button>
+          <button class="btn btn-primary" type="submit"><i data-lucide="user-plus"></i>Join Slot</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="addRestaurantModal">
+    <div class="modal-content">
+      <div class="modal-header"><h2>Add restaurant to <span id="addRestaurantLocation">New Delhi</span></h2><button class="modal-close" data-close="addRestaurantModal" type="button"><i data-lucide="x"></i></button></div>
+      <form id="addRestaurantForm">
+        <label class="form-label" for="newRestaurantName">Name</label>
+        <input class="form-input" id="newRestaurantName" required>
+        <label class="form-label" for="newRestaurantCuisine">Cuisine</label>
+        <select class="form-select" id="newRestaurantCuisine" required>
+          <option value="">Choose cuisine</option>
+          <option>Indian</option>
+          <option>South Indian</option>
+          <option>Cafe</option>
+          <option>Japanese</option>
+          <option>Italian</option>
+          <option>Thai</option>
+          <option>Mexican</option>
+          <option>Fast Food</option>
+        </select>
+        <label class="form-label" for="newRestaurantRating">Rating</label>
+        <input class="form-input" id="newRestaurantRating" type="number" min="1" max="5" step="0.1" value="4.4">
+        <label class="form-label" for="newRestaurantDistance">Distance in km</label>
+        <input class="form-input" id="newRestaurantDistance" type="number" min="0" step="0.1" value="1.5">
+        <label class="form-label" for="newRestaurantAddress">Address</label>
+        <input class="form-input" id="newRestaurantAddress">
+        <label class="form-label" for="newRestaurantNotes">Notes</label>
+        <textarea class="form-textarea" id="newRestaurantNotes" rows="3"></textarea>
+        <div class="form-buttons">
+          <button class="btn btn-ghost" data-close="addRestaurantModal" type="button">Cancel</button>
+          <button class="btn btn-primary" type="submit"><i data-lucide="plus"></i>Add Restaurant</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="rateRestaurantModal">
+    <div class="modal-content">
+      <div class="modal-header"><h2>Rate <span id="rateRestaurantName">restaurant</span></h2><button class="modal-close" data-close="rateRestaurantModal" type="button"><i data-lucide="x"></i></button></div>
+      <form id="ratingForm">
+        <label class="form-label" for="ratingValue">Rating</label>
+        <input class="form-input" id="ratingValue" type="number" min="1" max="5" step="1" value="5">
+        <label class="form-label" for="ratingReview">Review</label>
+        <textarea class="form-textarea" id="ratingReview" rows="3"></textarea>
+        <div class="form-buttons">
+          <button class="btn btn-ghost" data-close="rateRestaurantModal" type="button">Cancel</button>
+          <button class="btn btn-primary" type="submit"><i data-lucide="star"></i>Submit Rating</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="chatModal">
+    <div class="modal-content chat-modal">
+      <div class="modal-header"><h2 id="chatTitle">Slot chat</h2><button class="modal-close" data-close="chatModal" type="button"><i data-lucide="x"></i></button></div>
+      <div class="chat-messages" id="chatMessages"></div>
+      <form class="chat-form" id="chatForm">
+        <input class="form-input" id="chatInput" placeholder="Type a message" autocomplete="off">
+        <button class="btn btn-primary" type="submit"><i data-lucide="send"></i>Send</button>
+      </form>
+    </div>
+  </div>
+
+  <aside class="panel" id="locationPanel">
+    <div class="panel-header"><h2>Location</h2><button class="panel-close" data-panel-close="locationPanel" type="button"><i data-lucide="x"></i></button></div>
+    <form class="inline-form" id="locationSearchForm">
+      <input class="form-input" id="locationSearchInput" placeholder="Search city or area">
+      <button class="btn btn-primary" type="submit"><i data-lucide="search"></i></button>
+    </form>
+    <button class="btn btn-ghost full" id="detectLocationBtn" type="button"><i data-lucide="locate-fixed"></i>Use current location</button>
+    <div class="panel-content" id="locationList"></div>
+  </aside>
+
+  <aside class="panel" id="notificationsPanel">
+    <div class="panel-header"><h2>Notifications</h2><button class="panel-close" data-panel-close="notificationsPanel" type="button"><i data-lucide="x"></i></button></div>
+    <button class="btn btn-ghost full" id="markAllReadBtn" type="button">Mark all as read</button>
+    <div class="panel-content" id="notificationsList"></div>
+  </aside>
+
+  <aside class="panel" id="messagesPanel">
+    <div class="panel-header"><h2>Messages</h2><button class="panel-close" data-panel-close="messagesPanel" type="button"><i data-lucide="x"></i></button></div>
+    <div class="panel-content" id="messagesList"></div>
+  </aside>
+
+  <div class="toast" id="toast"></div>
+  <script type="module" src="./src/app.js"></script>
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('previewDemoBtn')?.addEventListener('click', () => document.getElementById('tryDemoBtn')?.click());
+      window.lucide?.createIcons();
+    });
+  </script>
+</body>
+</html>
