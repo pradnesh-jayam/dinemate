@@ -3,6 +3,7 @@ import { slotServices, notificationServices, serverTimestamp, auth } from './fir
 import { showModal, closeModal, showToast } from './ui.js';
 import { formatDate, formatTime, getToday, debounce } from './utils.js';
 import * as locations from './locations.js';
+import { isDemoModeActive, DEMO_SLOTS } from './demoData.js';
 
 let slots = [];
 let slotsListener = null;
@@ -25,6 +26,13 @@ function initListenerDebounce() {
 function setupSlotsListenerImmediate() {
   if (slotsListener) slotsListener();
 
+  // In demo mode, use demo data instead of Firestore
+  if (isDemoModeActive()) {
+    slots = DEMO_SLOTS;
+    renderSlots();
+    return;
+  }
+
   const location = locations.getCurrentLocation();
   slotsListener = slotServices.onSlotsChanged(
     location,
@@ -39,6 +47,9 @@ function setupSlotsListenerImmediate() {
   );
 }
 
+/**
+ * Sets up the real-time listener for dining slots
+ */
 export function setupSlotsListener() {
   initListenerDebounce();
 
@@ -54,14 +65,27 @@ export function setupSlotsListener() {
   setupSlotsListenerDebounced();
 }
 
+/**
+ * Gets the current state of past slots visibility
+ * @returns {boolean} Whether past slots are shown
+ */
 export function getShowPastSlots() {
   return showPastSlots;
 }
 
+/**
+ * Sets the visibility state of past slots
+ * @param {boolean} value - Whether to show past slots
+ */
 export function setShowPastSlots(value) {
   showPastSlots = value;
 }
 
+/**
+ * Opens the create slot modal pre-filled with the given restaurant
+ * @param {string} restaurantId - Firestore document ID of the restaurant
+ * @param {string} restaurantName - Display name shown in the form
+ */
 export function openCreateSlotModal(restaurantId, restaurantName) {
   document.getElementById('slotRestaurant').value = restaurantName;
   document.getElementById('slotRestaurant').dataset.id = restaurantId;
@@ -74,6 +98,9 @@ export function openCreateSlotModal(restaurantId, restaurantName) {
   showModal('createSlotModal');
 }
 
+/**
+ * Creates a quick dining slot with default values (1 hour from now)
+ */
 export async function createQuickSlot() {
   const restaurantId = document.getElementById('slotRestaurant').dataset.id;
   const restaurantName = document.getElementById('slotRestaurant').value;
@@ -109,6 +136,10 @@ export async function createQuickSlot() {
   }
 }
 
+/**
+ * Handles the create slot form submission
+ * @param {Event} e - Form submit event
+ */
 export async function handleCreateSlot(e) {
   e.preventDefault();
   const restaurantId = document.getElementById('slotRestaurant').dataset.id;
@@ -227,6 +258,10 @@ function renderSlots() {
   }).join('');
 }
 
+/**
+ * Opens the join slot modal with pre-filled slot information
+ * @param {string} slotId - Firestore document ID of the slot
+ */
 export async function openJoinModal(slotId) {
   try {
     const slotDoc = await slotServices.getSlot(slotId);
@@ -246,6 +281,10 @@ export async function openJoinModal(slotId) {
   }
 }
 
+/**
+ * Handles the join slot form submission
+ * @param {Event} e - Form submit event
+ */
 export async function handleJoinSlot(e) {
   e.preventDefault();
   const slotId = document.getElementById('joinSlotModal').dataset.slotId;
@@ -295,12 +334,22 @@ export async function handleJoinSlot(e) {
   }
 }
 
+/**
+ * Shares a dining slot to clipboard
+ * @param {string} restaurant - Restaurant name
+ * @param {string} date - Date string
+ * @param {string} time - Time string
+ */
 export function shareSlot(restaurant, date, time) {
   const text = `Join me for dinner at ${restaurant} on ${formatDate(date)} at ${formatTime(time)}! Find me on DineMate 🍽️`;
   navigator.clipboard.writeText(text);
   showToast('Copied to clipboard!', 'success');
 }
 
+/**
+ * Cancels and deletes a dining slot
+ * @param {string} slotId - Firestore document ID of the slot
+ */
 export async function cancelSlot(slotId) {
   if (!confirm('Cancel this slot?')) return;
 
@@ -320,10 +369,16 @@ export async function cancelSlot(slotId) {
   }
 }
 
+/**
+ * Applies current filter values to the slots list
+ */
 export function applyFilters() {
   renderSlots();
 }
 
+/**
+ * Clears all filter values and re-renders the slots list
+ */
 export function clearFilters() {
   document.getElementById('cuisineFilter').value = '';
   document.getElementById('dateFilter').value = '';

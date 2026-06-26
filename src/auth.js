@@ -5,9 +5,13 @@ import { showToast } from './ui.js';
 import { setStorageItem, getStorageItem } from './utils.js';
 import * as locations from './locations.js';
 import * as notifications from './notifications.js';
+import { DEMO_USER, enableDemoMode, disableDemoMode, isDemoModeActive } from './demoData.js';
 
 let currentUser = null;
 
+/**
+ * Sets up Firebase authentication state listener
+ */
 export async function setupAuth() {
   authServices.onAuthStateChanged(async (user) => {
     if (user) {
@@ -23,6 +27,9 @@ export async function setupAuth() {
   });
 }
 
+/**
+ * Signs out the current user
+ */
 export function signOut() {
   if (confirm('Are you sure you want to sign out?')) {
     authServices.signOut().catch(err => {
@@ -31,11 +38,24 @@ export function signOut() {
   }
 }
 
+/**
+ * Gets the currently authenticated user
+ * @returns {Object|null} Current user object or null
+ */
 export function getCurrentUser() {
+  if (isDemoModeActive()) {
+    return DEMO_USER;
+  }
   return currentUser;
 }
 
 async function checkOnboarding() {
+  // Skip onboarding in demo mode
+  if (isDemoModeActive()) {
+    setStorageItem('dinemate-onboarded', true);
+    return;
+  }
+
   if (getStorageItem('dinemate-onboarded')) return;
   try {
     const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
@@ -150,6 +170,11 @@ function showApp() {
   document.getElementById('loginPage').style.display = 'none';
   document.getElementById('appContainer').classList.add('active');
 
+  // Show demo banner if in demo mode
+  if (isDemoModeActive()) {
+    showDemoBanner();
+  }
+
   // Load all data
   locations.initializeLocations();
 }
@@ -159,7 +184,30 @@ function showLogin() {
   document.getElementById('appContainer').classList.remove('active');
 }
 
-// Setup Google Sign-In Button
+function showDemoBanner() {
+  const banner = document.getElementById('demoBanner');
+  if (banner) {
+    banner.style.display = 'flex';
+  }
+}
+
+function hideDemoBanner() {
+  const banner = document.getElementById('demoBanner');
+  if (banner) {
+    banner.style.display = 'none';
+  }
+}
+
+window.exitDemo = () => {
+  disableDemoMode();
+  currentUser = null;
+  hideDemoBanner();
+  showLogin();
+};
+
+/**
+ * Sets up the Google sign-in button event listener
+ */
 export function setupGoogleSignInButton() {
   const googleSignInBtn = document.getElementById('googleSignInBtn');
   if (googleSignInBtn) {
@@ -171,6 +219,16 @@ export function setupGoogleSignInButton() {
         console.error('Sign-in error:', error);
         showToast('Sign in failed: ' + error.message, 'error');
       }
+    });
+  }
+
+  const demoBtn = document.getElementById('demoModeBtn');
+  if (demoBtn) {
+    demoBtn.addEventListener('click', () => {
+      enableDemoMode();
+      currentUser = DEMO_USER;
+      showApp();
+      showToast('👀 Demo mode — explore freely, nothing is saved', 'info');
     });
   }
 }

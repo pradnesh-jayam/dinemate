@@ -2,6 +2,7 @@
 import { notificationServices, auth } from './firebase.js';
 import { showPanel, closePanel, showToast, updateBadgeCount } from './ui.js';
 import { timeAgo } from './utils.js';
+import { isDemoModeActive, DEMO_NOTIFICATIONS, DEMO_USER } from './demoData.js';
 
 let notificationsListener = null;
 
@@ -9,6 +10,14 @@ export function setupNotificationsListener() {
   if (!auth.currentUser) return;
 
   if (notificationsListener) notificationsListener();
+
+  // In demo mode, use demo data instead of Firestore
+  if (isDemoModeActive()) {
+    renderNotifications(DEMO_NOTIFICATIONS);
+    const unreadCount = DEMO_NOTIFICATIONS.filter(n => !n.read).length;
+    updateBadgeCount('notificationBadge', unreadCount);
+    return;
+  }
 
   notificationsListener = notificationServices.onNotificationsChanged(
     auth.currentUser.uid,

@@ -1,11 +1,11 @@
 // Firebase Configuration
 export const firebaseConfig = {
-  apiKey: "AIzaSyCJncY4-RAtb8jWW_IMnAEktgZ9Ej8v-xY",
-  authDomain: "dinemate07.firebaseapp.com",
-  projectId: "dinemate07",
-  storageBucket: "dinemate07.firebasestorage.app",
-  messagingSenderId: "194248381333",
-  appId: "1:194248381333:web:c648f5f5ef016077d09c9c"
+  apiKey: import.meta.env?.VITE_FIREBASE_API_KEY || "AIzaSyCJncY4-RAtb8jWW_IMnAEktgZ9Ej8v-xY",
+  authDomain: import.meta.env?.VITE_FIREBASE_AUTH_DOMAIN || "dinemate07.firebaseapp.com",
+  projectId: import.meta.env?.VITE_FIREBASE_PROJECT_ID || "dinemate07",
+  storageBucket: import.meta.env?.VITE_FIREBASE_STORAGE_BUCKET || "dinemate07.firebasestorage.app",
+  messagingSenderId: import.meta.env?.VITE_FIREBASE_MESSAGING_SENDER_ID || "194248381333",
+  appId: import.meta.env?.VITE_FIREBASE_APP_ID || "1:194248381333:web:c648f5f5ef016077d09c9c"
 };
 
 // Cuisine Emoji Mapping

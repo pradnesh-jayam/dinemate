@@ -4,6 +4,7 @@ import { showModal, closeModal, showToast, renderList, getInputValue, setInputVa
 import { cuisineEmojis } from './config.js';
 import { debounce } from './utils.js';
 import * as locations from './locations.js';
+import { isDemoModeActive, DEMO_RESTAURANTS } from './demoData.js';
 
 let restaurants = [];
 let restaurantsListener = null;
@@ -25,6 +26,15 @@ function initListenerDebounce() {
 
 function setupRestaurantsListenerImmediate() {
   if (restaurantsListener) restaurantsListener();
+
+  // In demo mode, use demo data instead of Firestore
+  if (isDemoModeActive()) {
+    restaurants = DEMO_RESTAURANTS;
+    renderRestaurants();
+    renderCreateRestaurants();
+    populateCuisineFilter();
+    return;
+  }
 
   const location = locations.getCurrentLocation();
   restaurantsListener = restaurantServices.onRestaurantsChanged(

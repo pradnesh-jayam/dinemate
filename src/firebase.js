@@ -38,7 +38,11 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const googleProvider = new GoogleAuthProvider();
 
-// Error handler
+/**
+ * Handles Firebase errors and returns a standardized error object
+ * @param {Error} error - Firebase error object
+ * @returns {Object} Standardized error with code and message
+ */
 export const handleFirebaseError = (error) => {
   console.error('Firebase Error:', error.code, error.message);
   return {
@@ -55,16 +59,23 @@ const checkDemoMode = () => {
   }
 };
 
-// Auth Services
+/**
+ * Firebase authentication services
+ */
 export const authServices = {
+  /** Gets the current authenticated user */
   getCurrentUser: () => auth.currentUser,
 
+  /** Signs in with Google OAuth popup */
   signInWithGoogle: () => signInWithPopup(auth, googleProvider),
 
+  /** Signs out the current user */
   signOut: () => signOut(auth),
 
+  /** Sets up auth state change listener */
   onAuthStateChanged: (callback) => onAuthStateChanged(auth, callback),
 
+  /** Gets the ID token for the current user */
   getIdToken: async () => {
     const user = auth.currentUser;
     if (!user) return null;
@@ -72,22 +83,29 @@ export const authServices = {
   }
 };
 
-// User Services
+/**
+ * User document services
+ */
 export const userServices = {
+  /** Gets a user document by ID */
   getUser: (userId) => getDoc(doc(db, 'users', userId)),
 
+  /** Creates or updates a user document */
   createUser: (userId, userData) => {
     checkDemoMode();
     return setDoc(doc(db, 'users', userId), userData, { merge: true });
   },
 
+  /** Updates a user document */
   updateUser: (userId, updates) => {
     checkDemoMode();
     return updateDoc(doc(db, 'users', userId), updates);
   },
 
+  /** Gets a user profile */
   getUserProfile: (userId) => getDoc(doc(db, 'users', userId)),
 
+  /** Searches users (basic implementation) */
   searchUsers: (searchTerm) => {
     // Note: Full-text search requires Cloud Search or frontend filtering
     // For now, this returns all users (TODO: implement proper search)
@@ -117,11 +135,15 @@ export const locationServices = {
     })
 };
 
-// Restaurant Services
+/**
+ * Restaurant document services
+ */
 export const restaurantServices = {
+  /** Gets restaurants query for a location */
   getRestaurants: (location) =>
     query(collection(db, 'restaurants'), where('location', '==', location)),
 
+  /** Sets up real-time listener for restaurants */
   onRestaurantsChanged: (location, callback, onError = null) =>
     onSnapshot(
       query(collection(db, 'restaurants'), where('location', '==', location)),
@@ -136,6 +158,7 @@ export const restaurantServices = {
       }
     ),
 
+  /** Creates a new restaurant document */
   createRestaurant: (data) => {
     checkDemoMode();
     return addDoc(collection(db, 'restaurants'), {
@@ -146,6 +169,7 @@ export const restaurantServices = {
     });
   },
 
+  /** Gets all ratings for a restaurant */
   getRating: async (restaurantId) => {
     const snapshot = await getDocs(
       collection(db, 'restaurants', restaurantId, 'ratings')
@@ -153,6 +177,7 @@ export const restaurantServices = {
     return snapshot.docs.map(doc => doc.data());
   },
 
+  /** Adds or updates a user's rating for a restaurant */
   addRating: (restaurantId, userId, rating) => {
     checkDemoMode();
     return setDoc(
@@ -162,6 +187,7 @@ export const restaurantServices = {
     );
   },
 
+  /** Updates the average rating for a restaurant */
   updateAverageRating: (restaurantId, ratings) => {
     checkDemoMode();
     const avg = ratings.reduce((a, b) => a + b.rating, 0) / ratings.length;
@@ -169,8 +195,11 @@ export const restaurantServices = {
   }
 };
 
-// Slot Services
+/**
+ * Dining slot services
+ */
 export const slotServices = {
+  /** Creates a new dining slot */
   createSlot: (data) => {
     checkDemoMode();
     return addDoc(collection(db, 'slots'), {
@@ -182,6 +211,7 @@ export const slotServices = {
     });
   },
 
+  /** Sets up real-time listener for slots */
   onSlotsChanged: (location, callback, onError = null, ...constraints) =>
     onSnapshot(
       query(
@@ -202,8 +232,10 @@ export const slotServices = {
       }
     ),
 
+  /** Gets a slot document by ID */
   getSlot: (slotId) => getDoc(doc(db, 'slots', slotId)),
 
+  /** Joins a user to a slot */
   joinSlot: (slotId, participant) => {
     checkDemoMode();
     return updateDoc(doc(db, 'slots', slotId), {
@@ -211,6 +243,7 @@ export const slotServices = {
     });
   },
 
+  /** Removes a user from a slot */
   leaveSlot: (slotId, userId) => {
     checkDemoMode();
     // Requires reading current participants, filtering, and updating
@@ -221,24 +254,30 @@ export const slotServices = {
     });
   },
 
+  /** Updates a slot document */
   updateSlot: (slotId, updates) => {
     checkDemoMode();
     return updateDoc(doc(db, 'slots', slotId), updates);
   },
 
+  /** Cancels a slot by setting status */
   cancelSlot: (slotId) => {
     checkDemoMode();
     return updateDoc(doc(db, 'slots', slotId), { status: 'cancelled' });
   },
 
+  /** Deletes a slot document */
   deleteSlot: (slotId) => {
     checkDemoMode();
     return deleteDoc(doc(db, 'slots', slotId));
   }
 };
 
-// Chat Services
+/**
+ * Chat message services
+ */
 export const chatServices = {
+  /** Sends a message to a slot's chat */
   sendMessage: (slotId, message) => {
     checkDemoMode();
     return addDoc(collection(db, 'slots', slotId, 'messages'), {
@@ -247,6 +286,7 @@ export const chatServices = {
     });
   },
 
+  /** Sets up real-time listener for slot messages */
   onMessagesChanged: (slotId, callback) =>
     onSnapshot(
       query(
@@ -261,8 +301,11 @@ export const chatServices = {
     )
 };
 
-// Notification Services
+/**
+ * Notification services
+ */
 export const notificationServices = {
+  /** Creates a new notification */
   createNotification: (data) => {
     checkDemoMode();
     return addDoc(collection(db, 'notifications'), {
@@ -272,6 +315,7 @@ export const notificationServices = {
     });
   },
 
+  /** Sets up real-time listener for user notifications */
   onNotificationsChanged: (userId, callback, onError = null) =>
     onSnapshot(
       query(
@@ -290,11 +334,13 @@ export const notificationServices = {
       }
     ),
 
+  /** Marks a notification as read */
   markAsRead: (notificationId) => {
     checkDemoMode();
     return updateDoc(doc(db, 'notifications', notificationId), { read: true });
   },
 
+  /** Marks all notifications for a user as read */
   markAllAsRead: async (userId) => {
     checkDemoMode();
     const snapshot = await getDocs(
@@ -312,8 +358,11 @@ export const notificationServices = {
   }
 };
 
-// Friend Services
+/**
+ * Friend services
+ */
 export const friendServices = {
+  /** Sends a friend request */
   sendFriendRequest: (fromId, toId) => {
     checkDemoMode();
     return addDoc(collection(db, 'users', toId, 'friendRequests'), {
@@ -324,6 +373,7 @@ export const friendServices = {
     });
   },
 
+  /** Accepts a friend request */
   acceptFriendRequest: async (fromId, toId, requestId) => {
     checkDemoMode();
     const batch = writeBatch(db);
@@ -344,11 +394,13 @@ export const friendServices = {
     return batch.commit();
   },
 
+  /** Rejects a friend request */
   rejectFriendRequest: (toId, requestId) => {
     checkDemoMode();
     return deleteDoc(doc(db, 'users', toId, 'friendRequests', requestId));
   },
 
+  /** Removes a friend connection */
   removeFriend: async (userId, friendId) => {
     checkDemoMode();
     const batch = writeBatch(db);
@@ -357,12 +409,15 @@ export const friendServices = {
     return batch.commit();
   },
 
+  /** Gets a user's friends list */
   getFriends: (userId) =>
     getDocs(collection(db, 'users', userId, 'friends')),
 
+  /** Gets a user's friend requests */
   getFriendRequests: (userId) =>
     getDocs(collection(db, 'users', userId, 'friendRequests')),
 
+  /** Sets up real-time listener for friend requests */
   onFriendRequestsChanged: (userId, callback) =>
     onSnapshot(
       collection(db, 'users', userId, 'friendRequests'),
@@ -374,21 +429,29 @@ export const friendServices = {
     )
 };
 
-// Badge Services
+/**
+ * Badge and achievement services
+ */
 export const badgeServices = {
+  /** Updates a user's badges list */
   updateBadges: (userId, badges) =>
     updateDoc(doc(db, 'users', userId), { badges }),
 
+  /** Adds a badge to a user's badges */
   addBadge: (userId, badgeId) =>
     updateDoc(doc(db, 'users', userId), {
       badges: arrayUnion(badgeId)
     })
 };
 
-// Batch Operations
+/**
+ * Batch write operations
+ */
 export const batchOperations = {
+  /** Creates a new write batch */
   writeBatch: () => writeBatch(db),
 
+  /** Commits a batch operation */
   commit: (batch) => batch.commit()
 };
 

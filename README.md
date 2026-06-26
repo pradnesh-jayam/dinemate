@@ -1,11 +1,17 @@
 # DineMate - Social Dining Platform
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Try%20it%20now-brightgreen)](https://YOUR_NETLIFY_URL.netlify.app)
+[![CI](https://github.com/YOUR_USERNAME/dinemate/actions/workflows/ci.yml/badge.svg)](https://github.com/YOUR_USERNAME/dinemate/actions)
+
+> 👀 **[Try the live demo](https://YOUR_NETLIFY_URL.netlify.app)** — click "Try Demo" on the login page, no account needed.
+
 A modern, modular social dining platform built with TypeScript, Firebase, and Firestore. Host or join dining experiences at restaurants and connect with other food enthusiasts.
 
 ## Features
 
 ### Core Functionality
-- 🔐 **Authentication** - Google OAuth sign-in with onboarding
+- � **Demo Mode** - Try the app instantly without sign-in with pre-loaded data
+- � **Authentication** - Google OAuth sign-in with onboarding
 - 🍽️ **Dining Slots** - Create, browse, and join dining experiences
 - 🏪 **Restaurants** - Add restaurants, rate experiences, view ratings
 - 💬 **Real-time Chat** - Message participants before and during meals
@@ -233,6 +239,11 @@ firebase login
 firebase init hosting
 firebase deploy
 ```
+
+## Screenshots
+
+> Add 2–3 GIF screen recordings here using [LICEcap](https://www.cockos.com/licecap/) or [Kap](https://getkap.co/).
+> Suggested: (1) login → demo mode → browsing slots, (2) creating a slot, (3) real-time chat.
 
 ## Usage
 

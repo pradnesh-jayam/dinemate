@@ -1,11 +1,18 @@
 // Analytics Dashboard Module
 import { showToast } from './ui.js';
+import { isDemoModeActive, DEMO_ANALYTICS } from './demoData.js';
 
 export async function loadAnalytics() {
   const container = document.getElementById('analyticsContent');
   if (!container) return;
 
   try {
+    // In demo mode, use demo data
+    if (isDemoModeActive()) {
+      renderAnalyticsDashboard(DEMO_ANALYTICS);
+      return;
+    }
+
     container.innerHTML = `
       <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 400px; text-align: center;">
         <div style="font-size: 48px; margin-bottom: 16px;">📊</div>
