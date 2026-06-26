@@ -345,6 +345,26 @@ export function isDemoModeActive() {
 }
 
 /**
+ * Sets demo mode state via sessionStorage
+ * @param {boolean} enabled Whether demo mode should be active
+ */
+export function setDemoMode(enabled) {
+  if (enabled) {
+    enableDemoMode();
+  } else {
+    disableDemoMode();
+  }
+}
+
+/**
+ * Gets the current demo mode state
+ * @returns {boolean} True if demo mode is active
+ */
+export function getDemoMode() {
+  return isDemoModeActive();
+}
+
+/**
  * Enables demo mode by setting sessionStorage
  */
 export function enableDemoMode() {
