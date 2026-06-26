@@ -11,6 +11,7 @@ import * as friends from './friends.js';
 import * as badges from './badges.js';
 import * as search from './search.js';
 import * as analytics from './analytics.js';
+import { initDemoMode, exitDemoMode, shouldBlockOperation } from './demoMode.js';
 import { closeModal, closePanel, showToast, closeAllModals, closeAllPanels } from './ui.js';
 
 // Global exports for onclick handlers
@@ -135,6 +136,10 @@ function setupEventListeners() {
   // Profile
   document.getElementById('editNameBtn')?.addEventListener('click', profiles.editName);
   document.getElementById('togglePastMeals')?.addEventListener('click', profiles.togglePastMeals);
+
+  // Demo Mode
+  document.getElementById('demoModeBtn')?.addEventListener('click', initDemoMode);
+  document.getElementById('exitDemoBtn')?.addEventListener('click', exitDemoMode);
 
   // User Menu
   const userMenuBtn = document.getElementById('userMenuBtn');

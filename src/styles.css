@@ -1,6 +1,87 @@
 /* DineMate v4 - Modern Dark Theme with Glassmorphism */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
+/* Demo Mode Styles */
+.demo-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(90deg, #f59e0b, #fbbf24);
+  color: #1f2937;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 9999;
+  font-weight: 600;
+  font-size: 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.demo-banner-close {
+  background: rgba(31, 41, 55, 0.2);
+  border: none;
+  padding: 6px 16px;
+  border-radius: var(--radius-md);
+  color: #1f2937;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.demo-banner-close:hover {
+  background: rgba(31, 41, 55, 0.3);
+  transform: scale(1.05);
+}
+
+.login-divider {
+  display: flex;
+  align-items: center;
+  margin: 20px 0;
+  color: var(--text-muted);
+}
+
+.login-divider::before,
+.login-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.login-divider span {
+  padding: 0 16px;
+  font-size: 14px;
+}
+
+.demo-btn {
+  width: 100%;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, #f59e0b, #fbbf24);
+  color: #1f2937;
+  border: none;
+  border-radius: var(--radius-lg);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+.demo-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(245, 158, 11, 0.4);
+}
+
+.demo-btn:active {
+  transform: translateY(0);
+}
+
 :root {
   /* Primary Colors - Modern Violet */
   --primary: #8b5cf6;

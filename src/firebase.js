@@ -30,6 +30,7 @@ import {
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
 import { firebaseConfig } from './config.js';
+import { isDemoModeActive } from './demoData.js';
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
@@ -44,6 +45,14 @@ export const handleFirebaseError = (error) => {
     code: error.code,
     message: error.message || 'An error occurred'
   };
+};
+
+// Demo mode check - blocks write operations
+const checkDemoMode = () => {
+  if (isDemoModeActive()) {
+    console.warn('Demo Mode: Write operations are disabled');
+    throw new Error('Demo mode does not allow write operations');
+  }
 };
 
 // Auth Services
@@ -67,11 +76,15 @@ export const authServices = {
 export const userServices = {
   getUser: (userId) => getDoc(doc(db, 'users', userId)),
 
-  createUser: (userId, userData) =>
-    setDoc(doc(db, 'users', userId), userData, { merge: true }),
+  createUser: (userId, userData) => {
+    checkDemoMode();
+    return setDoc(doc(db, 'users', userId), userData, { merge: true });
+  },
 
-  updateUser: (userId, updates) =>
-    updateDoc(doc(db, 'users', userId), updates),
+  updateUser: (userId, updates) => {
+    checkDemoMode();
+    return updateDoc(doc(db, 'users', userId), updates);
+  },
 
   getUserProfile: (userId) => getDoc(doc(db, 'users', userId)),
 
@@ -90,11 +103,13 @@ export const locationServices = {
     return docSnap.exists() ? docSnap.data().cities || [] : [];
   },
 
-  addLocation: (city) =>
-    setDoc(doc(db, 'meta', 'locations'),
+  addLocation: (city) => {
+    checkDemoMode();
+    return setDoc(doc(db, 'meta', 'locations'),
       { cities: arrayUnion(city) },
       { merge: true }
-    ),
+    );
+  },
 
   onLocationsChanged: (callback) =>
     onSnapshot(doc(db, 'meta', 'locations'), (doc) => {
@@ -121,13 +136,15 @@ export const restaurantServices = {
       }
     ),
 
-  createRestaurant: (data) =>
-    addDoc(collection(db, 'restaurants'), {
+  createRestaurant: (data) => {
+    checkDemoMode();
+    return addDoc(collection(db, 'restaurants'), {
       ...data,
       createdAt: serverTimestamp(),
       rating: parseFloat(data.rating) || 4.0,
       distance: parseFloat(data.distance) || 0
-    }),
+    });
+  },
 
   getRating: async (restaurantId) => {
     const snapshot = await getDocs(
@@ -136,14 +153,17 @@ export const restaurantServices = {
     return snapshot.docs.map(doc => doc.data());
   },
 
-  addRating: (restaurantId, userId, rating) =>
-    setDoc(
+  addRating: (restaurantId, userId, rating) => {
+    checkDemoMode();
+    return setDoc(
       doc(db, 'restaurants', restaurantId, 'ratings', userId),
       { rating, uid: userId, createdAt: serverTimestamp() },
       { merge: true }
-    ),
+    );
+  },
 
   updateAverageRating: (restaurantId, ratings) => {
+    checkDemoMode();
     const avg = ratings.reduce((a, b) => a + b.rating, 0) / ratings.length;
     return updateDoc(doc(db, 'restaurants', restaurantId), { rating: avg });
   }
@@ -151,14 +171,16 @@ export const restaurantServices = {
 
 // Slot Services
 export const slotServices = {
-  createSlot: (data) =>
-    addDoc(collection(db, 'slots'), {
+  createSlot: (data) => {
+    checkDemoMode();
+    return addDoc(collection(db, 'slots'), {
       ...data,
       createdAt: serverTimestamp(),
       participants: data.participants || [],
       partySize: parseInt(data.partySize) || 1,
       maxCapacity: parseInt(data.maxCapacity) || parseInt(data.partySize) || 1
-    }),
+    });
+  },
 
   onSlotsChanged: (location, callback, onError = null, ...constraints) =>
     onSnapshot(
@@ -182,12 +204,15 @@ export const slotServices = {
 
   getSlot: (slotId) => getDoc(doc(db, 'slots', slotId)),
 
-  joinSlot: (slotId, participant) =>
-    updateDoc(doc(db, 'slots', slotId), {
+  joinSlot: (slotId, participant) => {
+    checkDemoMode();
+    return updateDoc(doc(db, 'slots', slotId), {
       participants: arrayUnion(participant)
-    }),
+    });
+  },
 
   leaveSlot: (slotId, userId) => {
+    checkDemoMode();
     // Requires reading current participants, filtering, and updating
     return getDoc(doc(db, 'slots', slotId)).then(docSnap => {
       const slot = docSnap.data();
@@ -196,19 +221,31 @@ export const slotServices = {
     });
   },
 
-  updateSlot: (slotId, updates) =>
-    updateDoc(doc(db, 'slots', slotId), updates),
+  updateSlot: (slotId, updates) => {
+    checkDemoMode();
+    return updateDoc(doc(db, 'slots', slotId), updates);
+  },
 
-  deleteSlot: (slotId) => deleteDoc(doc(db, 'slots', slotId))
+  cancelSlot: (slotId) => {
+    checkDemoMode();
+    return updateDoc(doc(db, 'slots', slotId), { status: 'cancelled' });
+  },
+
+  deleteSlot: (slotId) => {
+    checkDemoMode();
+    return deleteDoc(doc(db, 'slots', slotId));
+  }
 };
 
 // Chat Services
 export const chatServices = {
-  sendMessage: (slotId, message) =>
-    addDoc(collection(db, 'slots', slotId, 'messages'), {
+  sendMessage: (slotId, message) => {
+    checkDemoMode();
+    return addDoc(collection(db, 'slots', slotId, 'messages'), {
       ...message,
       createdAt: serverTimestamp()
-    }),
+    });
+  },
 
   onMessagesChanged: (slotId, callback) =>
     onSnapshot(
@@ -226,12 +263,14 @@ export const chatServices = {
 
 // Notification Services
 export const notificationServices = {
-  createNotification: (data) =>
-    addDoc(collection(db, 'notifications'), {
+  createNotification: (data) => {
+    checkDemoMode();
+    return addDoc(collection(db, 'notifications'), {
       ...data,
       createdAt: serverTimestamp(),
       read: false
-    }),
+    });
+  },
 
   onNotificationsChanged: (userId, callback, onError = null) =>
     onSnapshot(
@@ -251,10 +290,13 @@ export const notificationServices = {
       }
     ),
 
-  markAsRead: (notificationId) =>
-    updateDoc(doc(db, 'notifications', notificationId), { read: true }),
+  markAsRead: (notificationId) => {
+    checkDemoMode();
+    return updateDoc(doc(db, 'notifications', notificationId), { read: true });
+  },
 
   markAllAsRead: async (userId) => {
+    checkDemoMode();
     const snapshot = await getDocs(
       query(
         collection(db, 'notifications'),
@@ -272,15 +314,18 @@ export const notificationServices = {
 
 // Friend Services
 export const friendServices = {
-  sendFriendRequest: (fromId, toId) =>
-    addDoc(collection(db, 'users', toId, 'friendRequests'), {
+  sendFriendRequest: (fromId, toId) => {
+    checkDemoMode();
+    return addDoc(collection(db, 'users', toId, 'friendRequests'), {
       fromId,
       toId,
       status: 'pending',
       createdAt: serverTimestamp()
-    }),
+    });
+  },
 
   acceptFriendRequest: async (fromId, toId, requestId) => {
+    checkDemoMode();
     const batch = writeBatch(db);
 
     // Add to both users' friends collections
@@ -299,10 +344,13 @@ export const friendServices = {
     return batch.commit();
   },
 
-  rejectFriendRequest: (toId, requestId) =>
-    deleteDoc(doc(db, 'users', toId, 'friendRequests', requestId)),
+  rejectFriendRequest: (toId, requestId) => {
+    checkDemoMode();
+    return deleteDoc(doc(db, 'users', toId, 'friendRequests', requestId));
+  },
 
   removeFriend: async (userId, friendId) => {
+    checkDemoMode();
     const batch = writeBatch(db);
     batch.delete(doc(db, 'users', userId, 'friends', friendId));
     batch.delete(doc(db, 'users', friendId, 'friends', userId));
