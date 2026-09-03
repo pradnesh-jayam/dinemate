@@ -29,7 +29,11 @@ function setupRestaurantsListenerImmediate() {
 
   // In demo mode, use demo data instead of Firestore
   if (isDemoModeActive()) {
-    restaurants = DEMO_RESTAURANTS;
+    const currentLocation = locations.getCurrentLocation();
+    // Filter demo restaurants by location
+    restaurants = DEMO_RESTAURANTS.filter(r => 
+      r.location.toLowerCase().includes(currentLocation.toLowerCase())
+    );
     renderRestaurants();
     renderCreateRestaurants();
     populateCuisineFilter();
