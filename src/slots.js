@@ -28,7 +28,11 @@ function setupSlotsListenerImmediate() {
 
   // In demo mode, use demo data instead of Firestore
   if (isDemoModeActive()) {
-    slots = DEMO_SLOTS;
+    const currentLocation = locations.getCurrentLocation();
+    // Filter demo slots by location
+    slots = DEMO_SLOTS.filter(s => 
+      s.location.toLowerCase().includes(currentLocation.toLowerCase())
+    );
     renderSlots();
     return;
   }
