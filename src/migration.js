@@ -92,6 +92,16 @@ export async function runMigration() {
   console.log('🚀 Starting Firestore migration...');
   
   try {
+    // Check if user is authenticated
+    const { auth } = await import('./firebase.js');
+    if (!auth.currentUser) {
+      console.error('❌ Migration failed: User not authenticated');
+      console.log('Please sign in first using Google Sign In, then run migration again.');
+      return;
+    }
+    
+    console.log(`✓ Authenticated as: ${auth.currentUser.displayName || auth.currentUser.email}`);
+    
     // Step 1: Add Indian restaurants to existing locations
     console.log('📍 Adding Indian restaurants to locations...');
     await addIndianRestaurants();
