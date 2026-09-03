@@ -68,7 +68,7 @@ export function setupRestaurantsListener() {
   setupRestaurantsListenerDebounced();
 }
 
-function renderRestaurants() {
+export function renderRestaurants() {
   const grid = document.getElementById('restaurantGrid');
   if (!grid) return;
 
