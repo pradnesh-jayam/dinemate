@@ -3,25 +3,35 @@
 
 import { db, auth, collection, query, getDocs, doc, setDoc, addDoc, serverTimestamp } from './firebase.js';
 
-const CUISINES = ['🍛 Indian', '🍝 Italian', '🍱 Japanese', '🌮 Mexican', '🍔 American', '🥟 Chinese'];
+// Fixed anchor date for 2028 demo mode
+const DEMO_ANCHOR_DATE = new Date('2028-06-15T00:00:00');
+
+const CUISINES = ['🍛 South Indian', '🍛 North Indian', '🍛 Hyderabadi', '🍛 Karnataka', '🍛 Punjabi', '🍛 Tamil'];
 
 const DEMO_RESTAURANTS = [
-  { name: 'Spice Route', cuisine: '🍛 Indian', location: 'Downtown' },
-  { name: 'Pasta Perfetto', cuisine: '🍝 Italian', location: 'North Beach' },
-  { name: 'Tokyo Kitchen', cuisine: '🍱 Japanese', location: 'Mission' },
-  { name: 'Taco Fiesta', cuisine: '🌮 Mexican', location: 'Castro' },
-  { name: 'Burger Bar', cuisine: '🍔 American', location: 'Soma' },
-  { name: 'Dragon House', cuisine: '🥟 Chinese', location: 'Chinatown' },
-  { name: 'Mediterranean Table', cuisine: '🍝 Italian', location: 'Downtown' },
-  { name: 'Ramen Champion', cuisine: '🍱 Japanese', location: 'Hayes Valley' },
+  { name: 'Krishna Hotel', cuisine: '🍛 South Indian', location: 'T. Nagar, Chennai' },
+  { name: 'Shanmugha Cafe', cuisine: '🍛 South Indian', location: 'Mylapore, Chennai' },
+  { name: 'Southern Canopy', cuisine: '🍛 South Indian', location: 'Adyar, Chennai' },
+  { name: 'Greenleaf Restaurant', cuisine: '🍛 North Indian', location: 'Connaught Place, New Delhi' },
+  { name: 'Paradise Biryani', cuisine: '🍛 Hyderabadi', location: 'Secunderabad, Hyderabad' },
+  { name: 'MTR Restaurant', cuisine: '🍛 Karnataka', location: 'Lalbagh, Bangalore' },
+  { name: 'Saravana Bhavan', cuisine: '🍛 South Indian', location: 'Anna Nagar, Chennai' },
+  { name: 'Haldiram\'s', cuisine: '🍛 North Indian', location: 'Karol Bagh, New Delhi' },
+  { name: 'Chutneys', cuisine: '🍛 South Indian', location: 'Jubilee Hills, Hyderabad' },
+  { name: 'Pind Balluchi', cuisine: '🍛 Punjabi', location: 'Vasant Kunj, New Delhi' },
+  { name: 'Vidyarthi Bhavan', cuisine: '🍛 Karnataka', location: 'Basavanagudi, Bangalore' },
+  { name: 'Bukhara', cuisine: '🍛 North Indian', location: 'Chanakyapuri, New Delhi' },
 ];
 
 const DEMO_USERS = [
-  { name: 'Alice Chen', email: 'alice@example.com', id: 'user_alice' },
-  { name: 'Bob Johnson', email: 'bob@example.com', id: 'user_bob' },
-  { name: 'Carol Smith', email: 'carol@example.com', id: 'user_carol' },
-  { name: 'David Lee', email: 'david@example.com', id: 'user_david' },
-  { name: 'Emma Wilson', email: 'emma@example.com', id: 'user_emma' },
+  { name: 'Arjun Kumar', email: 'arjun@example.com', id: 'user_arjun' },
+  { name: 'Priya Sharma', email: 'priya@example.com', id: 'user_priya' },
+  { name: 'Rahul Verma', email: 'rahul@example.com', id: 'user_rahul' },
+  { name: 'Anita Desai', email: 'anita@example.com', id: 'user_anita' },
+  { name: 'Suresh Kumar', email: 'suresh@example.com', id: 'user_suresh' },
+  { name: 'Meera Kapoor', email: 'meera@example.com', id: 'user_meera' },
+  { name: 'Vikram Singh', email: 'vikram@example.com', id: 'user_vikram' },
+  { name: 'Lakshmi Narayanan', email: 'lakshmi@example.com', id: 'user_lakshmi' },
 ];
 
 async function isFeedingEmpty() {
@@ -43,8 +53,8 @@ async function seedRestaurants() {
         name: restaurant.name,
         cuisine: restaurant.cuisine,
         location: restaurant.location,
-        lat: 37.7749 + Math.random() * 0.05,
-        lng: -122.4194 + Math.random() * 0.05,
+        lat: 12.9716 + Math.random() * 0.1,
+        lng: 77.5946 + Math.random() * 0.1,
         rating: Math.floor(Math.random() * 30) / 10 + 3.5,
         reviewCount: Math.floor(Math.random() * 50),
         createdBy: DEMO_USERS[0].id,
@@ -60,20 +70,25 @@ async function seedSlots() {
   console.log('🌱 Seeding dining slots...');
 
   const restaurants = await getDocs(collection(db, 'restaurants'));
-  const restaurantList = restaurants.docs.slice(0, 4);
+  const restaurantList = restaurants.docs.slice(0, 6);
 
-  const tomorrow = new Date();
+  // Use 2028 anchor date for consistency
+  const tomorrow = new Date(DEMO_ANCHOR_DATE);
   tomorrow.setDate(tomorrow.getDate() + 1);
 
   for (let i = 0; i < restaurantList.length; i++) {
     const restaurant = restaurantList[i].data();
-    const slotTime = ['18:00', '19:00', '20:00'][i % 3];
+    const slotTime = ['18:00', '19:00', '20:00', '18:30', '19:30', '20:30'][i % 6];
+    const daysOffset = i + 1; // Spread slots across multiple days
+
+    const slotDate = new Date(DEMO_ANCHOR_DATE);
+    slotDate.setDate(slotDate.getDate() + daysOffset);
 
     try {
       await addDoc(collection(db, 'slots'), {
         restaurantId: restaurantList[i].id,
         restaurantName: restaurant.name,
-        date: tomorrow.toISOString().split('T')[0],
+        date: slotDate.toISOString().split('T')[0],
         time: slotTime,
         maxCapacity: 4 + Math.floor(Math.random() * 4),
         participants: [DEMO_USERS[0].id, DEMO_USERS[1].id].slice(0, 1 + Math.floor(Math.random() * 2)),
@@ -121,10 +136,11 @@ async function seedLocations() {
   try {
     await setDoc(doc(db, 'meta', 'locations'), {
       locations: [
-        { name: 'San Francisco', lat: 37.7749, lng: -122.4194 },
-        { name: 'Oakland', lat: 37.8044, lng: -122.2712 },
-        { name: 'Berkeley', lat: 37.8716, lng: -122.2727 },
-        { name: 'Silicon Valley', lat: 37.3954, lng: -122.0781 },
+        { name: 'Chennai', lat: 13.0827, lng: 80.2707 },
+        { name: 'New Delhi', lat: 28.6139, lng: 77.2090 },
+        { name: 'Bangalore', lat: 12.9716, lng: 77.5946 },
+        { name: 'Hyderabad', lat: 17.3850, lng: 78.4867 },
+        { name: 'Mumbai', lat: 19.0760, lng: 72.8777 },
       ],
     });
   } catch (error) {

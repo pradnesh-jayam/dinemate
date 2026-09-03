@@ -28,6 +28,9 @@ export function initDemoMode() {
     banner.style.display = 'flex';
   }
   
+  // Add CSS class to body for spacing fix
+  document.body.classList.add('has-demo-banner');
+  
   // Hide login page and show app
   document.getElementById('loginPage').style.display = 'none';
   document.getElementById('appContainer').style.display = 'block';
@@ -47,6 +50,9 @@ export function exitDemoMode() {
   if (banner) {
     banner.style.display = 'none';
   }
+  
+  // Remove CSS class from body
+  document.body.classList.remove('has-demo-banner');
   
   // Show login page and hide app
   document.getElementById('loginPage').style.display = 'flex';

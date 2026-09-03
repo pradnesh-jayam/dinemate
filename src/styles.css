@@ -19,6 +19,15 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
+/* Add padding to main content when demo banner is visible */
+body.has-demo-banner .navbar {
+  top: 48px;
+}
+
+body.has-demo-banner .main-content {
+  padding-top: calc(var(--spacing-xl) + 48px);
+}
+
 .demo-banner-close {
   background: rgba(31, 41, 55, 0.2);
   border: none;
