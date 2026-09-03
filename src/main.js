@@ -63,6 +63,12 @@ function setupGlobalReferences() {
 
   // Navigation & UI
   window.showSection = ui.showSection;
+
+  // Demo Mode Support
+  window.updateUserInfo = profiles.updateUserInfo;
+  window.renderRestaurants = restaurants.renderRestaurants;
+  window.renderSlots = slots.renderSlots;
+  window.updateProfileStats = profiles.updateProfileStats;
 }
 
 function setupNavigation() {

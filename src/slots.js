@@ -186,7 +186,7 @@ export async function handleCreateSlot(e) {
   }
 }
 
-function renderSlots() {
+export function renderSlots() {
   const list = document.getElementById('slotList');
   if (!list) return;
 

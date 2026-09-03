@@ -3,6 +3,7 @@ import { auth, slotServices, getDoc, doc, db, query, collection, where, getDocs 
 import { showToast, setInputValue, setText } from './ui.js';
 import { updateDoc } from './firebase.js';
 import { getInitials } from './utils.js';
+import { isDemoModeActive } from './demoData.js';
 
 let showPastSlots = false;
 
@@ -94,6 +95,21 @@ export async function updateProfileStats() {
     document.getElementById('statJoined').textContent = '0';
     document.getElementById('statAdded').textContent = '0';
   }
+}
+
+export function updateUserInfo(user) {
+  if (!user) return;
+
+  document.getElementById('userName').textContent = user.displayName || user.name || 'User';
+  document.getElementById('profileName').textContent = user.displayName || user.name || 'User';
+  document.getElementById('profileEmail').textContent = user.email || 'user@email.com';
+  
+  const avatar = document.getElementById('userAvatar');
+  const profileAvatar = document.getElementById('profileAvatar');
+  const initials = getInitials(user.displayName || user.name || 'User');
+  
+  if (avatar) avatar.textContent = initials;
+  if (profileAvatar) profileAvatar.textContent = initials;
 }
 
 export async function renderUpcomingSlots() {
