@@ -13,7 +13,6 @@ import * as search from './search.js';
 import * as analytics from './analytics.js';
 import { initDemoMode, exitDemoMode, shouldBlockOperation } from './demoMode.js';
 import { closeModal, closePanel, showToast, closeAllModals, closeAllPanels } from './ui.js';
-import { runMigration } from './migration.js';
 
 // Global exports for onclick handlers
 window.closeModal = closeModal;
@@ -70,9 +69,6 @@ function setupGlobalReferences() {
   window.renderRestaurants = restaurants.renderRestaurants;
   window.renderSlots = slots.renderSlots;
   window.updateProfileStats = profiles.updateProfileStats;
-
-  // Migration Support
-  window.runMigration = runMigration;
 }
 
 function setupNavigation() {
