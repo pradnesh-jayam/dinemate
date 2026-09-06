@@ -20,7 +20,7 @@ Users can discover restaurants, create or join dining slots, connect with other 
 * **Frontend:** JavaScript, TypeScript, HTML, CSS, Vite
 * **Authentication:** Firebase Authentication
 * **Database:** Cloud Firestore
-* **Maps:** Leaflet + OpenStreetMap
+* **Maps:** Leaflet + OpenStreetMap(currently in devlopment)
 * **Testing:** Vitest
 * **Deployment:** Netlify
 
