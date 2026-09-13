@@ -213,7 +213,7 @@ async function seedSlots() {
           location: city,
           hostName: DEMO_USERS[Math.floor(Math.random() * DEMO_USERS.length)].name,
           hostPhoto: null,
-          createdBy: DEMO_USERS[Math.floor(Math.random() * DEMO_USERS.length)].id,
+          createdBy: auth.currentUser?.uid,
           createdAt: serverTimestamp(),
         });
       } catch (error) {
