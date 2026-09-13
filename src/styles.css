@@ -695,6 +695,12 @@ a:hover { color: var(--primary-light); }
   color: var(--text);
 }
 
+.restaurant-area {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  margin-bottom: 2px;
+}
+
 .restaurant-cuisine {
   font-size: var(--font-size-xs);
   color: var(--text-muted);

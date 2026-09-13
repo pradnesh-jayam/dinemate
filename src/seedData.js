@@ -1,26 +1,61 @@
 // Demo Data Generator - populates Firestore with sample data on first run
 // Checks if database is empty, then seeds restaurants, slots, users, and notifications
 
-import { db, auth, collection, query, getDocs, doc, setDoc, addDoc, serverTimestamp } from './firebase.js';
+import { db, auth, collection, query, where, getDocs, doc, setDoc, addDoc, serverTimestamp } from './firebase.js';
 
-// Fixed anchor date for 2028 demo mode
-const DEMO_ANCHOR_DATE = new Date('2028-06-15T00:00:00');
+// Dynamic anchor date - always 2 years in the future from when script runs
+const DEMO_ANCHOR_DATE = new Date();
+DEMO_ANCHOR_DATE.setFullYear(DEMO_ANCHOR_DATE.getFullYear() + 2);
 
-const CUISINES = ['🍛 South Indian', '🍛 North Indian', '🍛 Hyderabadi', '🍛 Karnataka', '🍛 Punjabi', '🍛 Tamil'];
+const CUISINES = ['🍛 South Indian', '🍛 North Indian', '🍛 Hyderabadi', '🍛 Karnataka', '🍛 Punjabi', '🍛 Tamil', '🍛 Maharashtrian', '🍛 Gujarati', '🍛 Bengali'];
+
+const CITIES = ['Chennai', 'New Delhi', 'Bangalore', 'Hyderabad', 'Mumbai'];
 
 const DEMO_RESTAURANTS = [
-  { name: 'Krishna Hotel', cuisine: '🍛 South Indian', location: 'T. Nagar, Chennai' },
-  { name: 'Shanmugha Cafe', cuisine: '🍛 South Indian', location: 'Mylapore, Chennai' },
-  { name: 'Southern Canopy', cuisine: '🍛 South Indian', location: 'Adyar, Chennai' },
-  { name: 'Greenleaf Restaurant', cuisine: '🍛 North Indian', location: 'Connaught Place, New Delhi' },
-  { name: 'Paradise Biryani', cuisine: '🍛 Hyderabadi', location: 'Secunderabad, Hyderabad' },
-  { name: 'MTR Restaurant', cuisine: '🍛 Karnataka', location: 'Lalbagh, Bangalore' },
-  { name: 'Saravana Bhavan', cuisine: '🍛 South Indian', location: 'Anna Nagar, Chennai' },
-  { name: 'Haldiram\'s', cuisine: '🍛 North Indian', location: 'Karol Bagh, New Delhi' },
-  { name: 'Chutneys', cuisine: '🍛 South Indian', location: 'Jubilee Hills, Hyderabad' },
-  { name: 'Pind Balluchi', cuisine: '🍛 Punjabi', location: 'Vasant Kunj, New Delhi' },
-  { name: 'Vidyarthi Bhavan', cuisine: '🍛 Karnataka', location: 'Basavanagudi, Bangalore' },
-  { name: 'Bukhara', cuisine: '🍛 North Indian', location: 'Chanakyapuri, New Delhi' },
+  // Chennai Restaurants (7)
+  { name: 'Krishna Hotel', cuisine: '🍛 South Indian', area: 'T. Nagar', city: 'Chennai' },
+  { name: 'Shanmugha Cafe', cuisine: '🍛 South Indian', area: 'Mylapore', city: 'Chennai' },
+  { name: 'Southern Canopy', cuisine: '🍛 South Indian', area: 'Adyar', city: 'Chennai' },
+  { name: 'Saravana Bhavan', cuisine: '🍛 South Indian', area: 'Anna Nagar', city: 'Chennai' },
+  { name: 'Murugan Idli Shop', cuisine: '🍛 South Indian', area: 'T. Nagar', city: 'Chennai' },
+  { name: 'Ponnusamy Hotel', cuisine: '🍛 South Indian', area: 'Ashok Nagar', city: 'Chennai' },
+  { name: 'Anjappar', cuisine: '🍛 South Indian', area: 'Nungambakkam', city: 'Chennai' },
+  
+  // New Delhi Restaurants (7)
+  { name: 'Greenleaf Restaurant', cuisine: '🍛 North Indian', area: 'Connaught Place', city: 'New Delhi' },
+  { name: 'Haldiram\'s', cuisine: '🍛 North Indian', area: 'Karol Bagh', city: 'New Delhi' },
+  { name: 'Pind Balluchi', cuisine: '🍛 Punjabi', area: 'Vasant Kunj', city: 'New Delhi' },
+  { name: 'Bukhara', cuisine: '🍛 North Indian', area: 'Chanakyapuri', city: 'New Delhi' },
+  { name: 'Moti Mahal', cuisine: '🍛 North Indian', area: 'Daryaganj', city: 'New Delhi' },
+  { name: 'Indian Accent', cuisine: '🍛 North Indian', area: 'Lodhi Road', city: 'New Delhi' },
+  { name: 'Karim\'s', cuisine: '🍛 North Indian', area: 'Jama Masjid', city: 'New Delhi' },
+  
+  // Bangalore Restaurants (7)
+  { name: 'MTR Restaurant', cuisine: '🍛 Karnataka', area: 'Lalbagh', city: 'Bangalore' },
+  { name: 'Vidyarthi Bhavan', cuisine: '🍛 Karnataka', area: 'Basavanagudi', city: 'Bangalore' },
+  { name: 'CTR', cuisine: '🍛 Karnataka', area: 'Malleswaram', city: 'Bangalore' },
+  { name: 'Mavalli Tiffin Rooms', cuisine: '🍛 Karnataka', area: 'Indiranagar', city: 'Bangalore' },
+  { name: 'Vasanta Bhavan', cuisine: '🍛 South Indian', area: 'Shivajinagar', city: 'Bangalore' },
+  { name: 'Dasaprakash', cuisine: '🍛 South Indian', area: 'Gandhinagar', city: 'Bangalore' },
+  { name: 'Namma SLV', cuisine: '🍛 Karnataka', area: 'Jayanagar', city: 'Bangalore' },
+  
+  // Hyderabad Restaurants (7)
+  { name: 'Paradise Biryani', cuisine: '🍛 Hyderabadi', area: 'Secunderabad', city: 'Hyderabad' },
+  { name: 'Chutneys', cuisine: '🍛 South Indian', area: 'Jubilee Hills', city: 'Hyderabad' },
+  { name: 'Bawarchi', cuisine: '🍛 Hyderabadi', area: 'RTC Crossroads', city: 'Hyderabad' },
+  { name: ' Paradise Hotel', cuisine: '🍛 Hyderabadi', area: 'Basheerbagh', city: 'Hyderabad' },
+  { name: 'Kritunga', cuisine: '🍛 South Indian', area: 'Kukatpally', city: 'Hyderabad' },
+  { name: 'Ulava Curry', cuisine: '🍛 South Indian', area: 'Madhapur', city: 'Hyderabad' },
+  { name: 'Alpha Hotel', cuisine: '🍛 Hyderabadi', area: 'Abids', city: 'Hyderabad' },
+  
+  // Mumbai Restaurants (7)
+  { name: 'Cafe Leopold', cuisine: '🍛 North Indian', area: 'Colaba', city: 'Mumbai' },
+  { name: 'Britannia & Co', cuisine: '🍛 North Indian', area: 'Ballard Estate', city: 'Mumbai' },
+  { name: 'Mahesh Lunch Home', cuisine: '🍛 South Indian', area: 'Fort', city: 'Mumbai' },
+  { name: 'Trishna', cuisine: '🍛 North Indian', area: 'Fort', city: 'Mumbai' },
+  { name: 'Aaswad', cuisine: '🍛 Maharashtrian', area: 'Dadar', city: 'Mumbai' },
+  { name: 'Mumbai Chowpatty', cuisine: '🍛 North Indian', area: 'Marine Drive', city: 'Mumbai' },
+  { name: 'Khyber', cuisine: '🍛 North Indian', area: 'Bandra', city: 'Mumbai' },
 ];
 
 const DEMO_USERS = [
@@ -32,71 +67,197 @@ const DEMO_USERS = [
   { name: 'Meera Kapoor', email: 'meera@example.com', id: 'user_meera' },
   { name: 'Vikram Singh', email: 'vikram@example.com', id: 'user_vikram' },
   { name: 'Lakshmi Narayanan', email: 'lakshmi@example.com', id: 'user_lakshmi' },
+  { name: 'Deepak Iyer', email: 'deepak@example.com', id: 'user_deepak' },
+  { name: 'Kavita Reddy', email: 'kavita@example.com', id: 'user_kavita' },
+  { name: 'Rajesh Menon', email: 'rajesh@example.com', id: 'user_rajesh' },
+  { name: 'Sneha Patel', email: 'sneha@example.com', id: 'user_sneha' },
+  { name: 'Amit Joshi', email: 'amit@example.com', id: 'user_amit' },
+  { name: 'Pooja Nair', email: 'pooja@example.com', id: 'user_pooja' },
+  { name: 'Karthik Srinivasan', email: 'karthik@example.com', id: 'user_karthik' },
+  { name: 'Divya Sharma', email: 'divya@example.com', id: 'user_divya' },
+  { name: 'Nikhil Agarwal', email: 'nikhil@example.com', id: 'user_nikhil' },
+  { name: 'Ritu Chauhan', email: 'ritu@example.com', id: 'user_ritu' },
+  { name: 'Gaurav Kumar', email: 'gaurav@example.com', id: 'user_gaurav' },
+  { name: 'Anjali Verma', email: 'anjali@example.com', id: 'user_anjali' },
 ];
 
-async function isFeedingEmpty() {
+async function getCityRestaurantCount(city) {
   try {
-    const restaurantDocs = await getDocs(collection(db, 'restaurants'));
-    return restaurantDocs.empty;
+    const q = query(collection(db, 'restaurants'), where('location', '==', city));
+    const snapshot = await getDocs(q);
+    return snapshot.size;
   } catch (error) {
-    console.warn('Could not check if database is empty:', error);
-    return false;
+    console.warn(`Could not check restaurant count for ${city}:`, error);
+    return 0;
+  }
+}
+
+async function getCitySlotCount(city) {
+  try {
+    const q = query(collection(db, 'slots'), where('location', '==', city));
+    const snapshot = await getDocs(q);
+    return snapshot.size;
+  } catch (error) {
+    console.warn(`Could not check slot count for ${city}:`, error);
+    return 0;
   }
 }
 
 async function seedRestaurants() {
-  console.log('🌱 Seeding restaurants...');
+  console.log('🌱 Seeding restaurants per city...');
 
-  for (const restaurant of DEMO_RESTAURANTS) {
-    try {
-      await addDoc(collection(db, 'restaurants'), {
-        name: restaurant.name,
-        cuisine: restaurant.cuisine,
-        location: restaurant.location,
-        lat: 12.9716 + Math.random() * 0.1,
-        lng: 77.5946 + Math.random() * 0.1,
-        rating: Math.floor(Math.random() * 30) / 10 + 3.5,
-        reviewCount: Math.floor(Math.random() * 50),
-        createdBy: DEMO_USERS[0].id,
-        createdAt: serverTimestamp(),
-      });
-    } catch (error) {
-      console.warn('Could not seed restaurant:', error);
+  for (const city of CITIES) {
+    const currentCount = await getCityRestaurantCount(city);
+    const cityRestaurants = DEMO_RESTAURANTS.filter(r => r.city === city);
+    const targetCount = Math.max(6, cityRestaurants.length);
+    
+    if (currentCount >= targetCount) {
+      console.log(`✅ ${city}: Already has ${currentCount} restaurants (target: ${targetCount})`);
+      continue;
+    }
+    
+    console.log(`🌱 ${city}: Seeding ${targetCount - currentCount} more restaurants (current: ${currentCount}, target: ${targetCount})`);
+    
+    for (const restaurant of cityRestaurants) {
+      try {
+        // Check if restaurant already exists to avoid duplicates
+        const existingQuery = query(collection(db, 'restaurants'), where('name', '==', restaurant.name), where('area', '==', restaurant.area));
+        const existingSnapshot = await getDocs(existingQuery);
+        
+        if (!existingSnapshot.empty) {
+          console.log(`⏭️  Skipping existing restaurant: ${restaurant.name}`);
+          continue;
+        }
+        
+        await addDoc(collection(db, 'restaurants'), {
+          name: restaurant.name,
+          cuisine: restaurant.cuisine,
+          location: restaurant.city,
+          area: restaurant.area,
+          lat: 12.9716 + Math.random() * 0.1,
+          lng: 77.5946 + Math.random() * 0.1,
+          rating: Math.floor(Math.random() * 30) / 10 + 3.5,
+          reviewCount: Math.floor(Math.random() * 50),
+          createdBy: DEMO_USERS[0].id,
+          createdAt: serverTimestamp(),
+        });
+      } catch (error) {
+        console.warn('Could not seed restaurant:', error);
+      }
     }
   }
 }
 
 async function seedSlots() {
-  console.log('🌱 Seeding dining slots...');
+  console.log('🌱 Seeding dining slots per city...');
 
-  const restaurants = await getDocs(collection(db, 'restaurants'));
-  const restaurantList = restaurants.docs.slice(0, 6);
+  for (const city of CITIES) {
+    const currentCount = await getCitySlotCount(city);
+    const targetCount = 10;
+    
+    if (currentCount >= targetCount) {
+      console.log(`✅ ${city}: Already has ${currentCount} slots (target: ${targetCount})`);
+      continue;
+    }
+    
+    console.log(`🌱 ${city}: Seeding ${targetCount - currentCount} more slots (current: ${currentCount}, target: ${targetCount})`);
+    
+    // Get restaurants for this city
+    const cityRestaurantsQuery = query(collection(db, 'restaurants'), where('location', '==', city));
+    const restaurantSnapshot = await getDocs(cityRestaurantsQuery);
+    const restaurantList = restaurantSnapshot.docs;
+    
+    if (restaurantList.length === 0) {
+      console.log(`⚠️  ${city}: No restaurants found, skipping slot seeding`);
+      continue;
+    }
+    
+    const slotsToCreate = targetCount - currentCount;
+    const slotTimes = ['18:00', '18:30', '19:00', '19:30', '20:00', '20:30', '21:00'];
+    
+    for (let i = 0; i < slotsToCreate; i++) {
+      const restaurant = restaurantList[i % restaurantList.length];
+      const restaurantData = restaurant.data();
+      const slotTime = slotTimes[i % slotTimes.length];
+      
+      // Spread slots across different dates from the dynamic anchor
+      const daysOffset = Math.floor(i / slotTimes.length) + 1;
+      const slotDate = new Date(DEMO_ANCHOR_DATE);
+      slotDate.setDate(slotDate.getDate() + daysOffset);
+      
+      // Create real participants with user IDs
+      const participantCount = Math.floor(Math.random() * 3);
+      const participants = [];
+      for (let j = 0; j < participantCount; j++) {
+        const randomUser = DEMO_USERS[Math.floor(Math.random() * DEMO_USERS.length)];
+        participants.push({
+          uid: randomUser.id,
+          name: randomUser.name,
+          photoURL: null,
+          partySize: 1
+        });
+      }
+      
+      const maxCapacity = participantCount + 1 + Math.floor(Math.random() * 3);
+      
+      try {
+        await addDoc(collection(db, 'slots'), {
+          restaurantId: restaurant.id,
+          restaurantName: restaurantData.name,
+          restaurantCuisine: restaurantData.cuisine,
+          date: slotDate.toISOString().split('T')[0],
+          time: slotTime,
+          maxCapacity: maxCapacity,
+          participants: participants,
+          partySize: 1,
+          location: city,
+          hostName: DEMO_USERS[Math.floor(Math.random() * DEMO_USERS.length)].name,
+          hostPhoto: null,
+          createdBy: DEMO_USERS[Math.floor(Math.random() * DEMO_USERS.length)].id,
+          createdAt: serverTimestamp(),
+        });
+      } catch (error) {
+        console.warn('Could not seed slot:', error);
+      }
+    }
+  }
+}
 
-  // Use 2028 anchor date for consistency
-  const tomorrow = new Date(DEMO_ANCHOR_DATE);
-  tomorrow.setDate(tomorrow.getDate() + 1);
+async function seedUsers() {
+  console.log('🌱 Seeding user profiles...');
 
-  for (let i = 0; i < restaurantList.length; i++) {
-    const restaurant = restaurantList[i].data();
-    const slotTime = ['18:00', '19:00', '20:00', '18:30', '19:30', '20:30'][i % 6];
-    const daysOffset = i + 1; // Spread slots across multiple days
-
-    const slotDate = new Date(DEMO_ANCHOR_DATE);
-    slotDate.setDate(slotDate.getDate() + daysOffset);
-
+  for (const user of DEMO_USERS) {
     try {
-      await addDoc(collection(db, 'slots'), {
-        restaurantId: restaurantList[i].id,
-        restaurantName: restaurant.name,
-        date: slotDate.toISOString().split('T')[0],
-        time: slotTime,
-        maxCapacity: 4 + Math.floor(Math.random() * 4),
-        participants: [DEMO_USERS[0].id, DEMO_USERS[1].id].slice(0, 1 + Math.floor(Math.random() * 2)),
-        createdBy: DEMO_USERS[Math.floor(Math.random() * DEMO_USERS.length)].id,
+      // Check if user profile already exists
+      const userDoc = await getDocs(query(collection(db, 'users'), where('uid', '==', user.id)));
+      if (!userDoc.empty) {
+        console.log(`⏭️  Skipping existing user: ${user.name}`);
+        continue;
+      }
+      
+      // Create user profile in users collection
+      await setDoc(doc(db, 'users', user.id), {
+        uid: user.id,
+        displayName: user.name,
+        email: user.email,
+        photoURL: null,
+        bio: 'Food enthusiast enjoying dining out',
+        location: CITIES[Math.floor(Math.random() * CITIES.length)],
+        createdAt: serverTimestamp(),
+      });
+      
+      // Also create in profiles collection for search compatibility
+      await setDoc(doc(db, 'profiles', user.id), {
+        uid: user.id,
+        displayName: user.name,
+        email: user.email,
+        photoURL: null,
+        bio: 'Food enthusiast enjoying dining out',
+        location: CITIES[Math.floor(Math.random() * CITIES.length)],
         createdAt: serverTimestamp(),
       });
     } catch (error) {
-      console.warn('Could not seed slot:', error);
+      console.warn('Could not seed user:', error);
     }
   }
 }
@@ -150,18 +311,24 @@ async function seedLocations() {
 
 export async function seedDemoData() {
   try {
-    const isEmpty = await isFeedingEmpty();
-
-    if (isEmpty) {
-      console.log('📊 Database empty - seeding demo data...');
-      await seedLocations();
-      await seedRestaurants();
-      await seedSlots();
-      await seedNotifications();
-      console.log('✅ Demo data seeded successfully');
-    } else {
-      console.log('📊 Database already populated - skipping seed');
-    }
+    console.log('📊 Starting top-up seed data check...');
+    
+    // Always seed user profiles (idempotent)
+    await seedUsers();
+    
+    // Always seed locations (idempotent)
+    await seedLocations();
+    
+    // Top-up restaurants per city
+    await seedRestaurants();
+    
+    // Top-up slots per city
+    await seedSlots();
+    
+    // Seed notifications for current user
+    await seedNotifications();
+    
+    console.log('✅ Seed data check completed');
   } catch (error) {
     console.error('Failed to seed demo data:', error);
   }
