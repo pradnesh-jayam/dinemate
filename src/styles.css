@@ -701,6 +701,13 @@ a:hover { color: var(--primary-light); }
   margin-bottom: var(--spacing-sm);
 }
 
+.restaurant-area {
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-sm);
+  font-weight: 500;
+}
+
 .restaurant-rating {
   display: flex;
   align-items: center;

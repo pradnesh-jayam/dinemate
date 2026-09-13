@@ -92,6 +92,7 @@ export function renderRestaurants() {
       <div class="restaurant-emoji">${cuisineEmojis[r.cuisine] || '🍽️'}</div>
       <div class="restaurant-name">${escapeHtml(r.name)}</div>
       <div class="restaurant-cuisine">${escapeHtml(r.cuisine)}</div>
+      <div class="restaurant-area">${escapeHtml(r.area || r.location)}</div>
       <div class="restaurant-rating">
         <span>${'★'.repeat(Math.round(r.rating))}</span>
         <span>${(r.rating || 0).toFixed(1)}</span>
@@ -115,6 +116,7 @@ function renderCreateRestaurants() {
       <div class="restaurant-emoji">${cuisineEmojis[r.cuisine] || '🍽️'}</div>
       <div class="restaurant-name">${escapeHtml(r.name)}</div>
       <div class="restaurant-cuisine">${escapeHtml(r.cuisine)}</div>
+      <div class="restaurant-area">${escapeHtml(r.area || r.location)}</div>
       <div class="restaurant-rating">
         <span>${'★'.repeat(Math.round(r.rating))}</span>
         <span>${(r.rating || 0).toFixed(1)}</span>
