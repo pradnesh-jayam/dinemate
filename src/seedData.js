@@ -13,49 +13,49 @@ const CITIES = ['Chennai', 'New Delhi', 'Bangalore', 'Hyderabad', 'Mumbai'];
 
 const DEMO_RESTAURANTS = [
   // Chennai Restaurants (7)
-  { name: 'Krishna Hotel', cuisine: '🍛 South Indian', location: 'T. Nagar, Chennai', city: 'Chennai' },
-  { name: 'Shanmugha Cafe', cuisine: '🍛 South Indian', location: 'Mylapore, Chennai', city: 'Chennai' },
-  { name: 'Southern Canopy', cuisine: '🍛 South Indian', location: 'Adyar, Chennai', city: 'Chennai' },
-  { name: 'Saravana Bhavan', cuisine: '🍛 South Indian', location: 'Anna Nagar, Chennai', city: 'Chennai' },
-  { name: 'Murugan Idli Shop', cuisine: '🍛 South Indian', location: 'T. Nagar, Chennai', city: 'Chennai' },
-  { name: 'Ponnusamy Hotel', cuisine: '🍛 South Indian', location: 'Ashok Nagar, Chennai', city: 'Chennai' },
-  { name: 'Anjappar', cuisine: '🍛 South Indian', location: 'Nungambakkam, Chennai', city: 'Chennai' },
+  { name: 'Krishna Hotel', cuisine: '🍛 South Indian', area: 'T. Nagar', city: 'Chennai' },
+  { name: 'Shanmugha Cafe', cuisine: '🍛 South Indian', area: 'Mylapore', city: 'Chennai' },
+  { name: 'Southern Canopy', cuisine: '🍛 South Indian', area: 'Adyar', city: 'Chennai' },
+  { name: 'Saravana Bhavan', cuisine: '🍛 South Indian', area: 'Anna Nagar', city: 'Chennai' },
+  { name: 'Murugan Idli Shop', cuisine: '🍛 South Indian', area: 'T. Nagar', city: 'Chennai' },
+  { name: 'Ponnusamy Hotel', cuisine: '🍛 South Indian', area: 'Ashok Nagar', city: 'Chennai' },
+  { name: 'Anjappar', cuisine: '🍛 South Indian', area: 'Nungambakkam', city: 'Chennai' },
   
   // New Delhi Restaurants (7)
-  { name: 'Greenleaf Restaurant', cuisine: '🍛 North Indian', location: 'Connaught Place, New Delhi', city: 'New Delhi' },
-  { name: 'Haldiram\'s', cuisine: '🍛 North Indian', location: 'Karol Bagh, New Delhi', city: 'New Delhi' },
-  { name: 'Pind Balluchi', cuisine: '🍛 Punjabi', location: 'Vasant Kunj, New Delhi', city: 'New Delhi' },
-  { name: 'Bukhara', cuisine: '🍛 North Indian', location: 'Chanakyapuri, New Delhi', city: 'New Delhi' },
-  { name: 'Moti Mahal', cuisine: '🍛 North Indian', location: 'Daryaganj, New Delhi', city: 'New Delhi' },
-  { name: 'Indian Accent', cuisine: '🍛 North Indian', location: 'Lodhi Road, New Delhi', city: 'New Delhi' },
-  { name: 'Karim\'s', cuisine: '🍛 North Indian', location: 'Jama Masjid, New Delhi', city: 'New Delhi' },
+  { name: 'Greenleaf Restaurant', cuisine: '🍛 North Indian', area: 'Connaught Place', city: 'New Delhi' },
+  { name: 'Haldiram\'s', cuisine: '🍛 North Indian', area: 'Karol Bagh', city: 'New Delhi' },
+  { name: 'Pind Balluchi', cuisine: '🍛 Punjabi', area: 'Vasant Kunj', city: 'New Delhi' },
+  { name: 'Bukhara', cuisine: '🍛 North Indian', area: 'Chanakyapuri', city: 'New Delhi' },
+  { name: 'Moti Mahal', cuisine: '🍛 North Indian', area: 'Daryaganj', city: 'New Delhi' },
+  { name: 'Indian Accent', cuisine: '🍛 North Indian', area: 'Lodhi Road', city: 'New Delhi' },
+  { name: 'Karim\'s', cuisine: '🍛 North Indian', area: 'Jama Masjid', city: 'New Delhi' },
   
   // Bangalore Restaurants (7)
-  { name: 'MTR Restaurant', cuisine: '🍛 Karnataka', location: 'Lalbagh, Bangalore', city: 'Bangalore' },
-  { name: 'Vidyarthi Bhavan', cuisine: '🍛 Karnataka', location: 'Basavanagudi, Bangalore', city: 'Bangalore' },
-  { name: 'CTR', cuisine: '🍛 Karnataka', location: 'Malleswaram, Bangalore', city: 'Bangalore' },
-  { name: 'Mavalli Tiffin Rooms', cuisine: '🍛 Karnataka', location: 'Indiranagar, Bangalore', city: 'Bangalore' },
-  { name: 'Vasanta Bhavan', cuisine: '🍛 South Indian', location: 'Shivajinagar, Bangalore', city: 'Bangalore' },
-  { name: 'Dasaprakash', cuisine: '🍛 South Indian', location: 'Gandhinagar, Bangalore', city: 'Bangalore' },
-  { name: 'Namma SLV', cuisine: '🍛 Karnataka', location: 'Jayanagar, Bangalore', city: 'Bangalore' },
+  { name: 'MTR Restaurant', cuisine: '🍛 Karnataka', area: 'Lalbagh', city: 'Bangalore' },
+  { name: 'Vidyarthi Bhavan', cuisine: '🍛 Karnataka', area: 'Basavanagudi', city: 'Bangalore' },
+  { name: 'CTR', cuisine: '🍛 Karnataka', area: 'Malleswaram', city: 'Bangalore' },
+  { name: 'Mavalli Tiffin Rooms', cuisine: '🍛 Karnataka', area: 'Indiranagar', city: 'Bangalore' },
+  { name: 'Vasanta Bhavan', cuisine: '🍛 South Indian', area: 'Shivajinagar', city: 'Bangalore' },
+  { name: 'Dasaprakash', cuisine: '🍛 South Indian', area: 'Gandhinagar', city: 'Bangalore' },
+  { name: 'Namma SLV', cuisine: '🍛 Karnataka', area: 'Jayanagar', city: 'Bangalore' },
   
   // Hyderabad Restaurants (7)
-  { name: 'Paradise Biryani', cuisine: '🍛 Hyderabadi', location: 'Secunderabad, Hyderabad', city: 'Hyderabad' },
-  { name: 'Chutneys', cuisine: '🍛 South Indian', location: 'Jubilee Hills, Hyderabad', city: 'Hyderabad' },
-  { name: 'Bawarchi', cuisine: '🍛 Hyderabadi', location: 'RTC Crossroads, Hyderabad', city: 'Hyderabad' },
-  { name: ' Paradise Hotel', cuisine: '🍛 Hyderabadi', location: 'Basheerbagh, Hyderabad', city: 'Hyderabad' },
-  { name: 'Kritunga', cuisine: '🍛 South Indian', location: 'Kukatpally, Hyderabad', city: 'Hyderabad' },
-  { name: 'Ulava Curry', cuisine: '🍛 South Indian', location: 'Madhapur, Hyderabad', city: 'Hyderabad' },
-  { name: 'Alpha Hotel', cuisine: '🍛 Hyderabadi', location: 'Abids, Hyderabad', city: 'Hyderabad' },
+  { name: 'Paradise Biryani', cuisine: '🍛 Hyderabadi', area: 'Secunderabad', city: 'Hyderabad' },
+  { name: 'Chutneys', cuisine: '🍛 South Indian', area: 'Jubilee Hills', city: 'Hyderabad' },
+  { name: 'Bawarchi', cuisine: '🍛 Hyderabadi', area: 'RTC Crossroads', city: 'Hyderabad' },
+  { name: ' Paradise Hotel', cuisine: '🍛 Hyderabadi', area: 'Basheerbagh', city: 'Hyderabad' },
+  { name: 'Kritunga', cuisine: '🍛 South Indian', area: 'Kukatpally', city: 'Hyderabad' },
+  { name: 'Ulava Curry', cuisine: '🍛 South Indian', area: 'Madhapur', city: 'Hyderabad' },
+  { name: 'Alpha Hotel', cuisine: '🍛 Hyderabadi', area: 'Abids', city: 'Hyderabad' },
   
   // Mumbai Restaurants (7)
-  { name: 'Cafe Leopold', cuisine: '🍛 North Indian', location: 'Colaba, Mumbai', city: 'Mumbai' },
-  { name: 'Britannia & Co', cuisine: '🍛 North Indian', location: 'Ballard Estate, Mumbai', city: 'Mumbai' },
-  { name: 'Mahesh Lunch Home', cuisine: '🍛 South Indian', location: 'Fort, Mumbai', city: 'Mumbai' },
-  { name: 'Trishna', cuisine: '🍛 North Indian', location: 'Fort, Mumbai', city: 'Mumbai' },
-  { name: 'Aaswad', cuisine: '🍛 Maharashtrian', location: 'Dadar, Mumbai', city: 'Mumbai' },
-  { name: 'Mumbai Chowpatty', cuisine: '🍛 North Indian', location: 'Marine Drive, Mumbai', city: 'Mumbai' },
-  { name: 'Khyber', cuisine: '🍛 North Indian', location: 'Bandra, Mumbai', city: 'Mumbai' },
+  { name: 'Cafe Leopold', cuisine: '🍛 North Indian', area: 'Colaba', city: 'Mumbai' },
+  { name: 'Britannia & Co', cuisine: '🍛 North Indian', area: 'Ballard Estate', city: 'Mumbai' },
+  { name: 'Mahesh Lunch Home', cuisine: '🍛 South Indian', area: 'Fort', city: 'Mumbai' },
+  { name: 'Trishna', cuisine: '🍛 North Indian', area: 'Fort', city: 'Mumbai' },
+  { name: 'Aaswad', cuisine: '🍛 Maharashtrian', area: 'Dadar', city: 'Mumbai' },
+  { name: 'Mumbai Chowpatty', cuisine: '🍛 North Indian', area: 'Marine Drive', city: 'Mumbai' },
+  { name: 'Khyber', cuisine: '🍛 North Indian', area: 'Bandra', city: 'Mumbai' },
 ];
 
 const DEMO_USERS = [
@@ -83,7 +83,7 @@ const DEMO_USERS = [
 
 async function getCityRestaurantCount(city) {
   try {
-    const q = query(collection(db, 'restaurants'), where('location', '>=', city), where('location', '<=', city + '\uf8ff'));
+    const q = query(collection(db, 'restaurants'), where('location', '==', city));
     const snapshot = await getDocs(q);
     return snapshot.size;
   } catch (error) {
@@ -121,7 +121,7 @@ async function seedRestaurants() {
     for (const restaurant of cityRestaurants) {
       try {
         // Check if restaurant already exists to avoid duplicates
-        const existingQuery = query(collection(db, 'restaurants'), where('name', '==', restaurant.name), where('location', '==', restaurant.location));
+        const existingQuery = query(collection(db, 'restaurants'), where('name', '==', restaurant.name), where('area', '==', restaurant.area));
         const existingSnapshot = await getDocs(existingQuery);
         
         if (!existingSnapshot.empty) {
@@ -132,7 +132,8 @@ async function seedRestaurants() {
         await addDoc(collection(db, 'restaurants'), {
           name: restaurant.name,
           cuisine: restaurant.cuisine,
-          location: restaurant.location,
+          location: restaurant.city,
+          area: restaurant.area,
           lat: 12.9716 + Math.random() * 0.1,
           lng: 77.5946 + Math.random() * 0.1,
           rating: Math.floor(Math.random() * 30) / 10 + 3.5,
@@ -162,7 +163,7 @@ async function seedSlots() {
     console.log(`🌱 ${city}: Seeding ${targetCount - currentCount} more slots (current: ${currentCount}, target: ${targetCount})`);
     
     // Get restaurants for this city
-    const cityRestaurantsQuery = query(collection(db, 'restaurants'), where('location', '>=', city), where('location', '<=', city + '\uf8ff'));
+    const cityRestaurantsQuery = query(collection(db, 'restaurants'), where('location', '==', city));
     const restaurantSnapshot = await getDocs(cityRestaurantsQuery);
     const restaurantList = restaurantSnapshot.docs;
     
