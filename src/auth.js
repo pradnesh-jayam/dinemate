@@ -154,9 +154,9 @@ async function loadUserData() {
     if (profileName) profileName.textContent = currentUser.displayName || 'User';
     if (profileEmail) profileEmail.textContent = currentUser.email;
     
-    // Seed demo data after successful login (top-up seeding)
+        // Seed demo data after successful login (top-up seeding, runs in background)
     if (!isDemoModeActive()) {
-      await seedDemoData();
+      seedDemoData().catch(err => console.error('Background seeding failed:', err));
     }
   } catch (error) {
     console.error('Failed to load user data:', error);
