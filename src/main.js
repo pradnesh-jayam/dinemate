@@ -13,8 +13,7 @@ import * as search from './search.js';
 import * as analytics from './analytics.js';
 import { initDemoMode, exitDemoMode, shouldBlockOperation } from './demoMode.js';
 import { closeModal, closePanel, showToast, closeAllModals, closeAllPanels } from './ui.js';
-import { db, collection, addDoc, getDocs, query, where } from './firebase.js';
-import { auth } from './firebase.js';
+import { db, collection, addDoc, getDocs, query, where, auth as firebaseAuth } from './firebase.js';
 
 // Migration data
 const INDIAN_RESTAURANTS = {
@@ -90,7 +89,7 @@ const SLOT_DATES_2028 = [
 const SLOT_TIMES = ['12:00', '13:00', '19:00', '20:00', '21:00'];
 
 async function runMigration() {
-  if (!auth.currentUser) {
+  if (!auth.getCurrentUser()) {
     showToast('Please sign in first', 'error');
     return;
   }
