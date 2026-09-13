@@ -138,7 +138,7 @@ async function seedRestaurants() {
           lng: 77.5946 + Math.random() * 0.1,
           rating: Math.floor(Math.random() * 30) / 10 + 3.5,
           reviewCount: Math.floor(Math.random() * 50),
-          createdBy: DEMO_USERS[0].id,
+          createdBy: auth.currentUser?.uid,
           createdAt: serverTimestamp(),
         });
       } catch (error) {
