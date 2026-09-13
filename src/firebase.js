@@ -239,10 +239,10 @@ export const slotServices = {
   joinSlot: (slotId, participant) => {
     checkDemoMode();
     return updateDoc(doc(db, 'slots', slotId), {
-      participants: arrayUnion(participant)
+      participants: arrayUnion(participant),
+      participantUids: arrayUnion(participant.uid)
     });
   },
-
   /** Removes a user from a slot */
   leaveSlot: (slotId, userId) => {
     checkDemoMode();
