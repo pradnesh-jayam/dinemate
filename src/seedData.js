@@ -209,6 +209,7 @@ async function seedSlots() {
           time: slotTime,
           maxCapacity: maxCapacity,
           participants: participants,
+          participantUids: participants.map(p => p.uid),
           partySize: 1,
           location: city,
           hostName: DEMO_USERS[Math.floor(Math.random() * DEMO_USERS.length)].name,
