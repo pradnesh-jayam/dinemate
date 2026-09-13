@@ -6,6 +6,7 @@ import { setStorageItem, getStorageItem } from './utils.js';
 import * as locations from './locations.js';
 import * as notifications from './notifications.js';
 import { DEMO_USER, enableDemoMode, disableDemoMode, isDemoModeActive } from './demoData.js';
+import { seedDemoData } from './seedData.js';
 
 let currentUser = null;
 
@@ -152,6 +153,11 @@ async function loadUserData() {
     if (profileAvatar) profileAvatar.textContent = initials;
     if (profileName) profileName.textContent = currentUser.displayName || 'User';
     if (profileEmail) profileEmail.textContent = currentUser.email;
+    
+    // Seed demo data after successful login (top-up seeding)
+    if (!isDemoModeActive()) {
+      await seedDemoData();
+    }
   } catch (error) {
     console.error('Failed to load user data:', error);
   }
