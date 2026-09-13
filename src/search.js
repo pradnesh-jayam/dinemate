@@ -1,4 +1,5 @@
 // Global Search Module
+import { db, collection, query, where, getDocs } from './firebase.js';
 import { showToast } from './ui.js';
 
 let cachedRestaurants = [];
@@ -11,14 +12,29 @@ export function setCachedData(restaurants, slots, users = []) {
   cachedUsers = users || [];
 }
 
-export async function performSearch(query) {
-  if (!query || query.length < 2) {
+async function loadUsersFromFirestore() {
+  try {
+    const usersSnapshot = await getDocs(collection(db, 'users'));
+    cachedUsers = usersSnapshot.docs.map(doc => doc.data());
+    console.log(`Loaded ${cachedUsers.length} users from Firestore for search`);
+  } catch (error) {
+    console.warn('Could not load users from Firestore:', error);
+  }
+}
+
+export async function performSearch(searchQuery) {
+  if (!searchQuery || searchQuery.length < 2) {
     document.getElementById('searchResults').innerHTML = '';
     return;
   }
 
   try {
-    const q = query.toLowerCase();
+    // Load users from Firestore if not already cached
+    if (cachedUsers.length === 0) {
+      await loadUsersFromFirestore();
+    }
+    
+    const q = searchQuery.toLowerCase();
 
     const restaurantResults = cachedRestaurants.filter(r =>
       r.name?.toLowerCase().includes(q) || r.cuisine?.toLowerCase().includes(q)
@@ -29,7 +45,7 @@ export async function performSearch(query) {
     );
 
     const results = {
-      users: cachedUsers.filter(u => u.name?.toLowerCase().includes(q)),
+      users: cachedUsers.filter(u => u.displayName?.toLowerCase().includes(q) || u.name?.toLowerCase().includes(q)),
       restaurants: restaurantResults,
       slots: slotResults
     };
@@ -53,7 +69,7 @@ function renderSearchResults(results) {
 
   if (results.users.length > 0) {
     html += '<h3>Users</h3>';
-    html += results.users.map(u => `<div class="panel-item">${u.name}</div>`).join('');
+    html += results.users.map(u => `<div class="panel-item">${u.displayName || u.name}</div>`).join('');
   }
 
   if (results.restaurants.length > 0) {
